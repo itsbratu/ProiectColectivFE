@@ -1,0 +1,2 @@
+Include all reusable components in this folder.
+Make folder for each of the reusable component and write the code inside a index.tsx file

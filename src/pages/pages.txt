@@ -1,0 +1,2 @@
+Include all the application pages here, in different folders.
+Inside each folder make an index.tsx file and write the code for the specific page there.
