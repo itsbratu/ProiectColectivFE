@@ -35,6 +35,9 @@ const CalendarPage = (props: Props) => {
     const [allDay, setAllDay] = useState(false);
     const [currentEvent, setCurrentEvent] = useState<Event | null>();
 
+    console.log(currentEvent);
+
+
     return (
         <Box display="flex" flexDirection="column">
             <Calendar
@@ -59,7 +62,7 @@ const CalendarPage = (props: Props) => {
                         variant="outlined"
                         placeholder="Title"
                         style={{ width: "300px" }}
-                        value={title}
+                        value={currentEvent && currentEvent.title}
                         onChange={(e: any) => setTitle(e.target.value)}
                     />
                     <FormControlLabel
@@ -77,7 +80,7 @@ const CalendarPage = (props: Props) => {
                         <DesktopDatePicker
                             label="Start date"
                             inputFormat="MM/DD/YYYY"
-                            value={startDate}
+                            value={currentEvent && currentEvent.startDate}
                             onChange={(e: any) => {
                                 setStartDate(e);
                             }}
@@ -86,9 +89,9 @@ const CalendarPage = (props: Props) => {
                         <DesktopDatePicker
                             label="End date"
                             inputFormat="MM/DD/YYYY"
-                            value={endDate}
+                            value={currentEvent && currentEvent.endDate}
                             onChange={(date) => {
-                                setEndDate(date);
+                                setEndDate(date!);
                             }}
                             renderInput={(params) => <TextField {...params} />}
                         />
@@ -98,7 +101,7 @@ const CalendarPage = (props: Props) => {
                     <TextField
                         rows={3}
                         multiline
-                        value={description}
+                        value={currentEvent && currentEvent.description}
                         onChange={(e: any) => setDescription(e.target.value)}
                         placeholder="Description"
                         style={{ width: 400 }}
