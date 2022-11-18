@@ -1,7 +1,8 @@
 import { Typography } from "@mui/material";
+import CalendarPage from "./pages/Calendar/CalendarPage";
 
 function App() {
-  return <Typography>Calendar</Typography>;
+  return <CalendarPage />
 }
 
 export default App;
