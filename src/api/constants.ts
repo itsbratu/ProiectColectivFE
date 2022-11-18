@@ -1,1 +1,1 @@
-export const CALENDAR_KEY = ["calendar"];
+export const EVENTS_KEY = ["events"];
