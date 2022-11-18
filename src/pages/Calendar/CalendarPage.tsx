@@ -18,6 +18,7 @@ import { useEvents } from "../../api/queries/useEvents";
 import { useAddEvent } from "../../api/mutations/useAddEvent";
 import { useEditEvent } from "../../api/mutations/useEditEvent";
 import { useDeleteEvent } from "../../api/mutations/useDeleteEvent";
+import "./CalendarStyle.css"
 
 interface Props { }
 
@@ -35,7 +36,6 @@ const CalendarPage = (props: Props) => {
     const [allDay, setAllDay] = useState(false);
     const [currentEvent, setCurrentEvent] = useState<Event | null>();
 
-    console.log(currentEvent);
 
 
     return (
@@ -45,10 +45,11 @@ const CalendarPage = (props: Props) => {
                 events={events}
                 startAccessor="startDate"
                 endAccessor="endDate"
-                style={{ height: "80vh" }}
+                style={{ height: "80vh", fontFamily: '"Roboto","Helvetica","Arial",sans-serif' }}
                 onSelectEvent={(event) => {
                     setCurrentEvent(event);
                 }}
+
             />
             <Box
                 sx={{ pt: 3, pb: 40 }}
