@@ -12,7 +12,7 @@ import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { Event } from "../../models/event";
-import {DesktopDatePicker, DesktopDateTimePicker, LocalizationProvider} from "@mui/x-date-pickers";
+import { DesktopDatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { useEvents } from "../../api/queries/useEvents";
 import { useAddEvent } from "../../api/mutations/useAddEvent";
@@ -24,31 +24,31 @@ interface Props { }
 
 const localizer = momentLocalizer(moment);
 
+const emptyEvent: Event = { allDay: false, title: "", description: "", startDate: new Date(), endDate: new Date(), id: "" }
+
 const CalendarPage = (props: Props) => {
-    const [events, setEvents] = useState(useEvents());
+    const { events } = useEvents();
     const { mutate: addEvent } = useAddEvent();
     const { mutate: updateEvent } = useEditEvent();
     const { mutate: deleteEvent } = useDeleteEvent();
-    const [startDate, setStartDate] = useState(new Date(Date.now()));
-    const [endDate, setEndDate] = useState(new Date(Date.now()));
-    const [title, setTitle] = useState("");
-    const [description, setDescription] = useState("");
-    const [allDay, setAllDay] = useState(false);
     const [currentEvent, setCurrentEvent] = useState<Event | null>();
-
 
     return (
         <Box display="flex" flexDirection="column">
             <Calendar
                 localizer={localizer}
-                events={events && []}
+                events={events}
                 startAccessor="startDate"
                 endAccessor="endDate"
                 style={{ height: "80vh", fontFamily: '"Roboto","Helvetica","Arial",sans-serif' }}
                 onSelectEvent={(event) => {
                     setCurrentEvent(event);
                 }}
+            // onView={(newView) => {
+            //     if (newView != "month") {
 
+            //     }
+            // }}
             />
             <Box
                 sx={{ pt: 3, pb: 40 }}
@@ -62,14 +62,14 @@ const CalendarPage = (props: Props) => {
                         variant="outlined"
                         placeholder="Title"
                         style={{ width: "300px" }}
-                        value={title}
-                        onChange={(e: any) => setTitle(e.target.value)}
+                        value={currentEvent ? currentEvent.title : ""}
+                        onChange={(e: any) => setCurrentEvent({ ...currentEvent!, title: e.target.value })}
                     />
                     <FormControlLabel
                         control={
                             <Checkbox
-                                value={allDay}
-                                onChange={(e: any) => setAllDay(e.target.checked)}
+                                value={currentEvent ? currentEvent.allDay : false}
+                                onChange={(e: any) => setCurrentEvent({ ...currentEvent!, allDay: e.target.checked })}
                             />
                         }
                         label="All day"
@@ -77,21 +77,25 @@ const CalendarPage = (props: Props) => {
                 </Box>
                 <Box display="flex" sx={{ pt: 2 }}>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DesktopDateTimePicker
+                        <DesktopDatePicker
                             label="Start date"
                             inputFormat="MM/DD/YYYY hh:mm"
-                            value={startDate}
-                            onChange={(date) => {
-                                date && setStartDate(date);
+                            value={currentEvent ? currentEvent.startDate : new Date()}
+                            onChange={(e: any) => {
+                                if (e != undefined) {
+                                    setCurrentEvent({ ...currentEvent!, startDate: e! })
+                                }
                             }}
                             renderInput={(params) => <TextField {...params} />}
                         />
-                        <DesktopDateTimePicker
+                        <DesktopDatePicker
                             label="End date"
                             inputFormat="MM/DD/YYYY hh:mm"
-                            value={endDate}
+                            value={currentEvent ? currentEvent.endDate : new Date()}
                             onChange={(date) => {
-                                date && setEndDate(date);
+                                if (date != undefined) {
+                                    setCurrentEvent({ ...currentEvent!, endDate: date! })
+                                }
                             }}
                             renderInput={(params) => <TextField {...params} />}
                         />
@@ -101,8 +105,8 @@ const CalendarPage = (props: Props) => {
                     <TextField
                         rows={3}
                         multiline
-                        value={description}
-                        onChange={(e: any) => setDescription(e.target.value)}
+                        value={currentEvent ? currentEvent.description : ""}
+                        onChange={(e: any) => setCurrentEvent({ ...currentEvent!, description: e.target.value })}
                         placeholder="Description"
                         style={{ width: 400 }}
                     />
@@ -110,16 +114,18 @@ const CalendarPage = (props: Props) => {
                 <Box display="flex">
                     <Button
                         variant="contained"
-                        onClick={() =>
+                        onClick={() => {
                             addEvent({
                                 createPayload: {
-                                    title: title,
-                                    allDay: allDay,
-                                    endDate: endDate,
-                                    startDate: startDate,
-                                    description: description
+                                    title: currentEvent?.title ?? "",
+                                    allDay: currentEvent?.allDay ?? false,
+                                    endDate: currentEvent?.endDate ?? new Date(),
+                                    startDate: currentEvent?.startDate ?? new Date(),
+                                    description: currentEvent?.description ?? "",
                                 },
                             })
+                            setCurrentEvent(emptyEvent)
+                        }
                         }
                     >
                         Add
@@ -128,21 +134,21 @@ const CalendarPage = (props: Props) => {
                         variant="contained"
                         color="error"
                         sx={{ ml: 3, mr: 3 }}
-                        onClick={() => currentEvent && deleteEvent({id: currentEvent.id})}
+                        onClick={() => deleteEvent({ id: currentEvent?.id! })}
                     >
                         Delete
                     </Button>
                     <Button
                         variant="contained"
                         onClick={() =>
-                            currentEvent && updateEvent({
+                            updateEvent({
                                 updatePayload: {
-                                    id: currentEvent.id,
-                                    title: title,
-                                    allDay: allDay,
-                                    endDate: endDate,
-                                    startDate: startDate,
-                                    description: description
+                                    id: currentEvent?.id!,
+                                    title: currentEvent?.title ?? "",
+                                    allDay: currentEvent?.allDay ?? false,
+                                    endDate: currentEvent?.endDate ?? new Date(),
+                                    startDate: currentEvent?.startDate ?? new Date(),
+                                    description: currentEvent?.description ?? ""
                                 },
                             })
                         }
@@ -151,7 +157,7 @@ const CalendarPage = (props: Props) => {
                     </Button>
                 </Box>
             </Box>
-        </Box>
+        </Box >
     );
 };
 

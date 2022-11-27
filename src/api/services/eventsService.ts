@@ -4,6 +4,8 @@ import http from "./common";
 class EventsService {
   async getEvents(): Promise<Event[]> {
     const result = await http.get<Event[]>("");
+    console.log(result);
+    
     return result.data;
   }
 
