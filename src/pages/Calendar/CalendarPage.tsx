@@ -44,11 +44,6 @@ const CalendarPage = (props: Props) => {
                 onSelectEvent={(event) => {
                     setCurrentEvent(event);
                 }}
-            // onView={(newView) => {
-            //     if (newView != "month") {
-
-            //     }
-            // }}
             />
             <Box
                 sx={{ pt: 3, pb: 40 }}
