@@ -5,6 +5,7 @@ export type Event = {
     endDate: Date;
     allDay: boolean;
     description: string;
+    tagsIds: string[];
 };
 
 export type AddEventPayload = Omit<Event, "id">;

@@ -24,7 +24,7 @@ interface Props { }
 
 const localizer = momentLocalizer(moment);
 
-const emptyEvent: Event = { allDay: false, title: "", description: "", startDate: new Date(), endDate: new Date(), id: "" }
+const emptyEvent: Event = { allDay: false, title: "", description: "", startDate: new Date(), endDate: new Date(), id: "", tagsIds:[] }
 
 const CalendarPage = (props: Props) => {
     const { events } = useEvents();
@@ -117,6 +117,7 @@ const CalendarPage = (props: Props) => {
                                     endDate: currentEvent?.endDate ?? new Date(),
                                     startDate: currentEvent?.startDate ?? new Date(),
                                     description: currentEvent?.description ?? "",
+                                    tagsIds: currentEvent?.tagsIds ?? [],
                                 },
                             })
                             setCurrentEvent(emptyEvent)
@@ -143,7 +144,8 @@ const CalendarPage = (props: Props) => {
                                     allDay: currentEvent?.allDay ?? false,
                                     endDate: currentEvent?.endDate ?? new Date(),
                                     startDate: currentEvent?.startDate ?? new Date(),
-                                    description: currentEvent?.description ?? ""
+                                    description: currentEvent?.description ?? "",
+                                    tagsIds: currentEvent?.tagsIds ?? []
                                 },
                             })
                         }
