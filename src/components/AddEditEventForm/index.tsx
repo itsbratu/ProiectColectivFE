@@ -7,6 +7,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Event } from "../../models/event";
 import { useAddEvent } from "../../api/mutations/useAddEvent";
 import { useEditEvent } from "../../api/mutations/useEditEvent";
+import { Multiselect } from "multiselect-react-dropdown";
 
 export interface Inputs {
   title: string;
@@ -14,12 +15,15 @@ export interface Inputs {
   endDate: Date;
   description: string;
   allDay: boolean;
+  tags: string[];
 }
 
 export type AddEditEventFormProps = {
   handleFormClose: () => void;
   editMode: boolean;
   event?: Event;
+  selected_tags?: string[];
+  user_tags?: string[];
   resetCurrentEvent: () => void;
   resetEditMode: () => void;
   openSnackbar: (message: string) => void;
@@ -30,6 +34,8 @@ export const AddEditEventForm = ({
   handleFormClose,
   editMode,
   event,
+  selected_tags = ["tag 1", "tag 2"],
+  user_tags = ["tag 1", "tag 2", "tag 3", "tag 4"],
   resetCurrentEvent,
   resetEditMode,
   openSnackbar,
@@ -140,6 +146,11 @@ export const AddEditEventForm = ({
               placeholder="Description"
               style={{ width: 400 }}
             />
+            <Multiselect showArrow options={user_tags} isObject={false} 
+              
+              selectedValues={selected_tags}
+            />
+      
           </LocalizationProvider>
           <FormControlLabel
             control={
