@@ -19,18 +19,22 @@ import { useAddEvent } from "../../api/mutations/useAddEvent";
 import { useEditEvent } from "../../api/mutations/useEditEvent";
 import { useDeleteEvent } from "../../api/mutations/useDeleteEvent";
 import "./CalendarStyle.css"
+import { USER_STORAGE_KEY } from "../../api/constants";
+import { StringDecoder } from "string_decoder";
 
-interface Props { }
+interface Props {
+    token: string
+}
 
 const localizer = momentLocalizer(moment);
 
-const emptyEvent: Event = { allDay: false, title: "", description: "", startDate: new Date(), endDate: new Date(), id: "", tagsIds:[] }
+const emptyEvent: Event = { allDay: false, title: "", description: "", startDate: new Date(), endDate: new Date(), id: "", tagsIds: [] }
 
-const CalendarPage = (props: Props) => {
-    const { events } = useEvents();
-    const { mutate: addEvent } = useAddEvent();
-    const { mutate: updateEvent } = useEditEvent();
-    const { mutate: deleteEvent } = useDeleteEvent();
+const CalendarPage = ({ token }: Props) => {
+    const { events } = useEvents(token);
+    const { mutate: addEvent } = useAddEvent(token);
+    const { mutate: updateEvent } = useEditEvent(token);
+    const { mutate: deleteEvent } = useDeleteEvent(token);
     const [currentEvent, setCurrentEvent] = useState<Event | null>();
 
     return (
@@ -152,6 +156,9 @@ const CalendarPage = (props: Props) => {
                     >
                         Update
                     </Button>
+                    <Button onClick={() => {
+                        localStorage.removeItem(USER_STORAGE_KEY)
+                    }}>Logout</Button>
                 </Box>
             </Box>
         </Box >

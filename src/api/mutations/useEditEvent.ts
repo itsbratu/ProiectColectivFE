@@ -8,10 +8,10 @@ type EditEventMutationPayload = {
   updatePayload: Event;
 };
 
-export const useEditEvent = () => {
+export const useEditEvent = (token: string) => {
   const queryClient = useQueryClient();
   const { mutate } = useMutation<Event, AxiosError, EditEventMutationPayload>(
-    ({ updatePayload }) => eventsService.editEvent(updatePayload),
+    ({ updatePayload }) => eventsService.editEvent(updatePayload, token),
     {
       onSuccess: () => {
         queryClient.invalidateQueries(EVENTS_KEY);

@@ -9,9 +9,9 @@ type useDeleteEventProps = {
   id: string;
 };
 
-export const useDeleteEvent = () => {
+export const useDeleteEvent = (token: string) => {
   const { mutate } = useMutation<Event, AxiosError, useDeleteEventProps>(
-    ({ id }) => eventsService.deleteEvent(id),
+    ({ id }) => eventsService.deleteEvent(id, token),
     {
       onSuccess: () => queryClient.invalidateQueries(EVENTS_KEY),
     }
