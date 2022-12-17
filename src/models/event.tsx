@@ -1,3 +1,5 @@
+import { Tag } from "./tag";
+
 export type Event = {
   id: string;
   title: string;
@@ -5,7 +7,7 @@ export type Event = {
   endDate: Date;
   allDay: boolean;
   description: string;
-  tagsIds: string[];
+  tags: Tag[];
 };
 
 export type AddEventPayload = Omit<Event, "id">;

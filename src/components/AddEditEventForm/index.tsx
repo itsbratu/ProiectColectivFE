@@ -5,6 +5,7 @@ import Button from "@mui/material/Button";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Event } from "../../models/event";
+import { Tag } from "../../models/tag";
 import { useAddEvent } from "../../api/mutations/useAddEvent";
 import { useEditEvent } from "../../api/mutations/useEditEvent";
 import { Multiselect } from "multiselect-react-dropdown";
@@ -15,7 +16,7 @@ export interface Inputs {
   endDate: Date;
   description: string;
   allDay: boolean;
-  tags: string[];
+  tags: Tag[];
 }
 
 export type AddEditEventFormProps = {
@@ -23,7 +24,7 @@ export type AddEditEventFormProps = {
   editMode: boolean;
   event?: Event;
   selected_tags?: string[];
-  user_tags?: string[];
+  user_tags_ids?: string[];
   resetCurrentEvent: () => void;
   resetEditMode: () => void;
   openSnackbar: (message: string) => void;
@@ -35,13 +36,16 @@ export const AddEditEventForm = ({
   editMode,
   event,
   selected_tags = ["tag 1", "tag 2"],
-  user_tags = ["tag 1", "tag 2", "tag 3", "tag 4"],
+  user_tags_ids = ["tag 1", "tag 2", "tag 3", "tag 4"],
   resetCurrentEvent,
   resetEditMode,
   openSnackbar,
   token,
 }: AddEditEventFormProps): JSX.Element => {
+  console.log(event?.tags);
+  console.log(event?.title);
   const [title, setTitle] = useState<string>(event ? event.title : "");
+  const [tags, setEventTags] = useState<Tag[]>(event ? event.tags : []);
   const [startDate, setStartDate] = useState<Date>(
     event ? event.startDate : new Date()
   );
@@ -66,7 +70,7 @@ export const AddEditEventForm = ({
           startDate: startDate,
           endDate: endDate,
           allDay: data.allDay,
-          tagsIds: [],
+          tags: data.tags,
         },
       });
       openSnackbar("Event successfully edited!");
@@ -80,7 +84,7 @@ export const AddEditEventForm = ({
           startDate: startDate,
           endDate: endDate,
           allDay: data.allDay,
-          tagsIds: [],
+          tags: data.tags,
         },
       });
       openSnackbar("Event successfully added!");
@@ -146,9 +150,10 @@ export const AddEditEventForm = ({
               placeholder="Description"
               style={{ width: 400 }}
             />
-            <Multiselect showArrow options={user_tags} isObject={false} 
+            <Multiselect showArrow options={tags} displayValue="name" 
               
-              selectedValues={selected_tags}
+              selectedValues={tags}
+              //onSelect={(e) => setEventTags(e.target.value)}
             />
       
           </LocalizationProvider>
