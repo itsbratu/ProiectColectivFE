@@ -17,6 +17,7 @@ import { useState } from 'react';
 import { useLoginRequest, User } from '../../api/mutations/useLoginRequest';
 import { useEffect } from 'react';
 import { USER_STORAGE_KEY } from '../../api/constants';
+import { AxiosError } from 'axios';
 
 const theme = createTheme();
 
@@ -24,13 +25,28 @@ interface Props {
     setToken: (token: string) => void;
 }
 
+type LoginError = {
+    username: string | null;
+    password: string | null;
+}
+
 export default function Login({ setToken }: Props) {
     const [user, setUser] = useState<User>({ username: "", password: "" })
-    const { mutate: login, data: loginData, isLoading } = useLoginRequest();
+    const { mutate: login, data: loginData, isLoading, error } = useLoginRequest();
+    const [loginError, setLoginError] = useState<LoginError>({ username: null, password: null })
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        await login({ createPayload: user });
+        if (user.username.length < 3 || user.password.length < 6) {
+            setLoginError({
+                ...loginError,
+                username: user.username.length < 3 ? "Username should have at least 3 characters" : null,
+                password: user.password.length < 6 ? "Password should have at leats 6 characters " : null
+            })
+        } else {
+            setLoginError({ username: null, password: null })
+            await login({ createPayload: user });
+        }
     };
 
     useEffect(() => {
@@ -39,6 +55,8 @@ export default function Login({ setToken }: Props) {
             setToken(loginData.token)
         }
     }, [loginData])
+
+    const hasLocalError = () => loginError.username != null || loginError.password != null
 
     return (
         <ThemeProvider theme={theme}>
@@ -68,6 +86,8 @@ export default function Login({ setToken }: Props) {
                             autoFocus
                             value={user.username}
                             onChange={e => setUser({ ...user, username: e.target.value })}
+                            error={loginError.username !== null}
+                            helperText={loginError.username}
                         />
                         <TextField
                             margin="normal"
@@ -80,7 +100,10 @@ export default function Login({ setToken }: Props) {
                             autoComplete="current-password"
                             value={user.password}
                             onChange={e => setUser({ ...user, password: e.target.value })}
+                            error={loginError.password !== null}
+                            helperText={loginError.password}
                         />
+                        {error && !hasLocalError() && <Typography mt={3} color="red">Couldn't log in with given credentials</Typography>}
                         <Button
                             type="submit"
                             fullWidth

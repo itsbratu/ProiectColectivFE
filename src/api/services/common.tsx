@@ -5,7 +5,7 @@ const dateKeyRx = /date/i;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Response<T = any, D = any> = AxiosResponse<T, D>;
 
-export default axios.create({
+const http = axios.create({
   baseURL: "http://localhost:8080/",
   headers: {
     "Content-Type": "application/json",
@@ -14,3 +14,5 @@ export default axios.create({
   withCredentials: false,
   transformResponse: (data) => JSON.parse(data, (key, value) => dateKeyRx.test(key) ? new Date(Date.parse(value)) : value)
 });
+
+export default http

@@ -34,7 +34,7 @@ function App() {
   return <BrowserRouter>
     <Switch>
       <Route path="/">
-        <CalendarPage />
+        <CalendarPage token={token} />
       </Route>
       <Route path="/login">
         <LoginPage setToken={setToken} />
