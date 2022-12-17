@@ -23,6 +23,7 @@ export type AddEditEventFormProps = {
   resetCurrentEvent: () => void;
   resetEditMode: () => void;
   openSnackbar: (message: string) => void;
+  token: string;
 };
 
 export const AddEditEventForm = ({
@@ -32,6 +33,7 @@ export const AddEditEventForm = ({
   resetCurrentEvent,
   resetEditMode,
   openSnackbar,
+  token,
 }: AddEditEventFormProps): JSX.Element => {
   const [title, setTitle] = useState<string>(event ? event.title : "");
   const [startDate, setStartDate] = useState<Date>(
@@ -45,8 +47,8 @@ export const AddEditEventForm = ({
   );
   const [allDay, setAllDay] = useState<boolean>(event ? event.allDay : false);
   const { register, handleSubmit, reset } = useForm<Inputs>();
-  const { mutate: addEvent } = useAddEvent();
-  const { mutate: editEvent } = useEditEvent();
+  const { mutate: addEvent } = useAddEvent(token);
+  const { mutate: editEvent } = useEditEvent(token);
 
   const onSubmit = async (data: Inputs) => {
     if (editMode) {

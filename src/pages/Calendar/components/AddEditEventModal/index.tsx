@@ -20,6 +20,7 @@ export type AddEditEventModalProps = {
   resetCurrentEvent: () => void;
   resetEditMode: () => void;
   openSnackbar: (message: string) => void;
+  token: string;
 };
 
 export const AddEditEventModal = ({
@@ -30,8 +31,9 @@ export const AddEditEventModal = ({
   resetCurrentEvent,
   resetEditMode,
   openSnackbar,
+  token,
 }: AddEditEventModalProps): JSX.Element => {
-  const { mutate: deleteEvent } = useDeleteEvent();
+  const { mutate: deleteEvent } = useDeleteEvent(token);
 
   return (
     <Dialog
@@ -86,6 +88,7 @@ export const AddEditEventModal = ({
           resetCurrentEvent={resetCurrentEvent}
           resetEditMode={resetEditMode}
           openSnackbar={openSnackbar}
+          token={token}
         />
       </DialogContent>
     </Dialog>

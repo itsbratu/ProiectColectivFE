@@ -13,11 +13,15 @@ import Alert from "@mui/material/Alert";
 
 const localizer = momentLocalizer(moment);
 
-const CalendarPage = () => {
+export type CalendarPageProps = {
+  token: string;
+};
+
+const CalendarPage = ({ token }: CalendarPageProps) => {
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>("");
   const [editModeFlag, setEditModeFlag] = useState<boolean>(true);
-  const { events } = useEvents();
+  const { events } = useEvents(token);
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [currentEvent, setCurrentEvent] = useState<Event | undefined>();
 
@@ -78,6 +82,7 @@ const CalendarPage = () => {
         openSnackbar={(snackbarMessage: string) =>
           handleSnackbarOpen(snackbarMessage)
         }
+        token={token}
       />
       <Snackbar
         open={openSnackbar}
