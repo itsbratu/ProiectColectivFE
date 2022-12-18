@@ -1,11 +1,11 @@
 import { AxiosError } from "axios";
 import { useMutation, useQueryClient } from "react-query";
-import { Event } from "../../models/event";
+import { Event, UpdateEventPayload } from "../../models/event";
 import { EVENTS_KEY } from "../constants";
 import eventsService from "../services/eventsService";
 
 type EditEventMutationPayload = {
-  updatePayload: Event;
+  updatePayload: UpdateEventPayload;
 };
 
 export const useEditEvent = (token: string) => {

@@ -11,6 +11,7 @@ import { useDeleteEvent } from "../../../../api/mutations/useDeleteEvent";
 import { AddEditEventForm } from "../../../../components/AddEditEventForm";
 import { Event } from "../../../../models/event";
 import IconButton from "@mui/material/IconButton";
+import { Tag } from "../../../../models/tag";
 
 export type AddEditEventModalProps = {
   editMode: boolean;
@@ -21,6 +22,7 @@ export type AddEditEventModalProps = {
   resetEditMode: () => void;
   openSnackbar: (message: string) => void;
   token: string;
+  user_tags_ids: Tag[];
 };
 
 export const AddEditEventModal = ({
@@ -32,6 +34,7 @@ export const AddEditEventModal = ({
   resetEditMode,
   openSnackbar,
   token,
+  user_tags_ids,
 }: AddEditEventModalProps): JSX.Element => {
   const { mutate: deleteEvent } = useDeleteEvent(token);
 
@@ -89,6 +92,7 @@ export const AddEditEventModal = ({
           resetEditMode={resetEditMode}
           openSnackbar={openSnackbar}
           token={token}
+          user_tags_ids={user_tags_ids}
         />
       </DialogContent>
     </Dialog>

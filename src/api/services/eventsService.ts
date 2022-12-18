@@ -1,4 +1,4 @@
-import { AddEventPayload, Event } from "../../models/event";
+import { AddEventPayload, Event, UpdateEventPayload } from "../../models/event";
 import { USER_STORAGE_KEY } from "../constants";
 import http from "./common";
 
@@ -23,7 +23,7 @@ class EventsService {
     return result.data;
   }
 
-  async editEvent(payload: Event, token: string): Promise<Event> {
+  async editEvent(payload: UpdateEventPayload, token: string): Promise<Event> {
     const result = await http.put<Event>(
       `/events/${payload.id}`,
       JSON.stringify(payload),

@@ -36,11 +36,7 @@ export const AddEditEventForm = ({
   editMode,
   event,
   selected_tags = ["tag 1", "tag 2"],
-  user_tags_ids = [
-    {"id": "decdb2ac-248c-4605-92e7-cf77cc542ea0", "name": "Job", "colorCode": "FF0000"},
-    {"id": "decdb2ac-248c-4605-92e7-cf77cc542ea0", "name": "Job2", "colorCode": "FFFF00"},
-    {"id": "decdb2ac-248c-4605-92e7-cf77cc542ea0", "name": "Job3", "colorCode": "FFF000"}
-    ],
+  user_tags_ids = [],
   resetCurrentEvent,
   resetEditMode,
   openSnackbar,
@@ -48,7 +44,7 @@ export const AddEditEventForm = ({
 }: AddEditEventFormProps): JSX.Element => {
   console.log(event?.tags);
   console.log(event?.title);
-  event?.tags.forEach(v =>{user_tags_ids.push(v)});
+  event?.tags.forEach(v => { user_tags_ids.push(v) });
   const [title, setTitle] = useState<string>(event ? event.title : "");
   const [tagsIds, setEventTags] = useState<Tag[]>(event ? event.tags : []);
   const [startDate, setStartDate] = useState<Date>(
@@ -75,7 +71,7 @@ export const AddEditEventForm = ({
           startDate: startDate,
           endDate: endDate,
           allDay: data.allDay,
-          tags: data.tags,
+          tagsIds: [],
         },
       });
       openSnackbar("Event successfully edited!");
@@ -89,7 +85,7 @@ export const AddEditEventForm = ({
           startDate: startDate,
           endDate: endDate,
           allDay: data.allDay,
-          tags: data.tags,
+          tagsIds: [],
         },
       });
       openSnackbar("Event successfully added!");
@@ -155,12 +151,12 @@ export const AddEditEventForm = ({
               placeholder="Description"
               style={{ width: 400 }}
             />
-            <Multiselect showArrow options={user_tags_ids} displayValue="name" 
-              
+            <Multiselect showArrow options={user_tags_ids} displayValue="name"
+
               selectedValues={tagsIds}
-              //onSelect={(e) => setEventTags(e.target.value)}
+            //onSelect={(e) => setEventTags(e.target.value)}
             />
-      
+
           </LocalizationProvider>
           <FormControlLabel
             control={
