@@ -52,6 +52,7 @@ export const AddEditEventForm = ({
   console.log(event?.title);
   const [title, setTitle] = useState<string>(event ? event.title : "");
   const [tagsIds, setEventTags] = useState<Tag[]>(event ? event.tags : []);
+  tagsIds.forEach(e=>selected_tags.push(e.id));
   const [startDate, setStartDate] = useState<Date>(
     event ? event.startDate : new Date()
   );
