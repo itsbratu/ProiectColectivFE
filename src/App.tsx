@@ -7,7 +7,7 @@ import { USER_STORAGE_KEY } from "./api/constants";
 import { useEffect } from "react";
 
 function App() {
-  const [token, setToken] = useState<string>();
+  const [token, setToken] = useState<string | null>();
   const [loaded, setLoaded] = useState<Boolean>(false)
 
   useEffect(() => {
@@ -34,7 +34,7 @@ function App() {
   return <BrowserRouter>
     <Switch>
       <Route path="/">
-        <CalendarPage token={token} />
+        <CalendarPage token={token} setToken={setToken} />
       </Route>
       <Route path="/login">
         <LoginPage setToken={setToken} />

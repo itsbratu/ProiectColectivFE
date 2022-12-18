@@ -11,14 +11,17 @@ import { AddEditEventModal } from "./components/AddEditEventModal";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import { useTags } from "../../api/queries/useTags";
+import LogoutIcon from '@mui/icons-material/Logout';
+import { USER_STORAGE_KEY } from "../../api/constants";
 
 const localizer = momentLocalizer(moment);
 
 export type CalendarPageProps = {
     token: string;
+    setToken: (token: string | null) => void;
 };
 
-const CalendarPage = ({ token }: CalendarPageProps) => {
+const CalendarPage = ({ token, setToken }: CalendarPageProps) => {
     const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
     const [snackbarMessage, setSnackbarMessage] = useState<string>("");
     const [editModeFlag, setEditModeFlag] = useState<boolean>(true);
@@ -64,12 +67,34 @@ const CalendarPage = ({ token }: CalendarPageProps) => {
                     },
                 }}
                 onClick={() => {
+                    localStorage.removeItem(USER_STORAGE_KEY)
+                    setToken(null)
+                }}
+            >
+                <LogoutIcon sx={{ fontSize: 40 }} />
+            </Button>
+            <Button
+                variant="contained"
+                sx={{
+                    position: "fixed",
+                    width: "75px",
+                    height: "75px",
+                    bottom: "20px",
+                    right: "110px",
+                    borderRadius: "45px",
+                    background: "#31b3ce",
+                    "&:hover": {
+                        background: "#31b3ce",
+                    },
+                }}
+                onClick={() => {
                     setOpenModal(true);
                     setEditModeFlag(false);
                 }}
             >
-                <AddIcon sx={{ fontSize: 60 }} />
+                <AddIcon sx={{ fontSize: 40 }} />
             </Button>
+
             <AddEditEventModal
                 event={currentEvent}
                 editMode={editModeFlag}
