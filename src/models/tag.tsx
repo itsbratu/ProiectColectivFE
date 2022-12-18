@@ -1,9 +1,8 @@
 export type Tag = {
-    id: string;
-    name: string;
-    colorCode: string;
-  };
-  
+  id: string;
+  name: string;
+  colorCode: string;
+};
 
-  export type AddTagPayload = Omit<Tag, "id">;
- 
+
+export type AddTagPayload = Omit<Tag, "id">;

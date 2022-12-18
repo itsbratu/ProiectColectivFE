@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { TextField, Box, FormControlLabel, Checkbox, Typography } from "@mui/material";
+import { TextField, Box, FormControlLabel, Checkbox, Typography, Chip, MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import Button from "@mui/material/Button";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -51,7 +51,7 @@ export const AddEditEventForm = ({
   console.log(event?.tags);
   console.log(event?.title);
   const [title, setTitle] = useState<string>(event ? event.title : "");
-  const [tagsIds, setEventTags] = useState<Tag[]>(event ? event.tags : []);
+  const [eventTags, setEventTags] = useState<Tag[]>(event ? event.tags : []);
   const [startDate, setStartDate] = useState<Date>(
     event ? event.startDate : new Date()
   );
@@ -67,19 +67,19 @@ export const AddEditEventForm = ({
   const { mutate: editEvent } = useEditEvent(token);
   const [eventError, setEventError] = useState<EventError>({ date: null, description: null, title: null })
 
-  function onSelect(selectedList: Tag[], selectedItem: Tag){
-      //console.log(selectedItem);
-      //selectedList.push(selectedItem.id);
-      console.log(selectedList);
-      selected_tags = selectedList.map(e=>e.id);
-      //console.log("selected tags:", selected_tags);
+  function onSelect(selectedList: Tag[], selectedItem: Tag) {
+    //console.log(selectedItem);
+    //selectedList.push(selectedItem.id);
+    console.log(selectedList);
+    selected_tags = selectedList.map(e => e.id);
+    //console.log("selected tags:", selected_tags);
   }
-  function onRemove(selectedList: Tag[], selectedItem: Tag){
-   // console.log(selectedItem);
+  function onRemove(selectedList: Tag[], selectedItem: Tag) {
+    // console.log(selectedItem);
     //const data = selectedList.filter(el=> el != selectedItem.id);
     //selectedList = data;
     console.log(selectedList);
-    selected_tags = selectedList.map(e=>e.id);
+    selected_tags = selectedList.map(e => e.id);
     //console.log("selected after delete tags: ", selected_tags);
   }
 
@@ -130,6 +130,16 @@ export const AddEditEventForm = ({
     handleFormClose();
   };
 
+  // const handleChange = (event: SelectChangeEvent<typeof eventTags>) => {
+  //   const {
+  //     target: { value },
+  //   } = event;
+  //   setEventTags(
+  //     // On autofill we get a stringified value.
+  //     typeof value === 'string' ? value.split(',') : value,
+  //   );
+  // };
+
   return (
     <>
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -139,6 +149,9 @@ export const AddEditEventForm = ({
           alignItems="center"
           gap="30px"
         >
+          {eventTags && <Box display="flex" gap="10px">
+            {eventTags.map(e => <Chip style={{ backgroundColor: `#${e.colorCode}` }} label={e.name} />)}
+          </Box>}
           <TextField
             {...register("title")}
             id="title"
@@ -192,13 +205,23 @@ export const AddEditEventForm = ({
               error={eventError.description !== null}
               helperText={eventError.description}
             />
-            <Multiselect showArrow options={user_tags_ids} displayValue="name"
+            <Select style={{ width: "100%" }} multiple
+              value={eventTags}
+              renderValue={s => s.map(e => e.name).join(",")}
+              onChange={e => {
+                console.log(e.target.value);
 
-              selectedValues={tagsIds}
-              onSelect={onSelect} // Function will trigger on select event
-              onRemove={onRemove} // Function will trigger on remove event
-            />
-            
+                // if (!(eventTags.filter(t => t.id === e.target.value).length != 0)) {
+                // @ts-ignore
+                setEventTags((e.target.value).map(eventId => typeof eventId === "string" ? user_tags_ids.find(tag => tag.id === eventId) as Tag : eventId))
+                // }
+              }
+              }>
+              {user_tags_ids && user_tags_ids.map(e =>
+                <MenuItem value={e.id} >{e.name}</MenuItem>
+              )}
+            </Select>
+
           </LocalizationProvider>
           <FormControlLabel
             control={
