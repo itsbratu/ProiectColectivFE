@@ -7,7 +7,7 @@ export type Event = {
   endDate: Date;
   allDay: boolean;
   description: string;
-  tags: Tag[];
+  tags: Tag[]; //should be name tagsIds to match BE call/ if rename tags dont work ??
 };
 
 export type AddEventPayload = Omit<Event, "id">;
