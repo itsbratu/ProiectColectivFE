@@ -41,7 +41,7 @@ export const AddEditEventForm = ({
   handleFormClose,
   editMode,
   event,
-  selected_tags = ["tag 1", "tag 2"],
+  selected_tags = [],
   user_tags_ids = [],
   resetCurrentEvent,
   resetEditMode,
@@ -50,7 +50,6 @@ export const AddEditEventForm = ({
 }: AddEditEventFormProps): JSX.Element => {
   console.log(event?.tags);
   console.log(event?.title);
-  event?.tags.forEach(v => { user_tags_ids.push(v) });
   const [title, setTitle] = useState<string>(event ? event.title : "");
   const [tagsIds, setEventTags] = useState<Tag[]>(event ? event.tags : []);
   const [startDate, setStartDate] = useState<Date>(
@@ -67,6 +66,22 @@ export const AddEditEventForm = ({
   const { mutate: addEvent } = useAddEvent(token);
   const { mutate: editEvent } = useEditEvent(token);
   const [eventError, setEventError] = useState<EventError>({ date: null, description: null, title: null })
+
+  function onSelect(selectedList: Tag[], selectedItem: Tag){
+      //console.log(selectedItem);
+      //selectedList.push(selectedItem.id);
+      console.log(selectedList);
+      selected_tags = selectedList.map(e=>e.id);
+      //console.log("selected tags:", selected_tags);
+  }
+  function onRemove(selectedList: Tag[], selectedItem: Tag){
+   // console.log(selectedItem);
+    //const data = selectedList.filter(el=> el != selectedItem.id);
+    //selectedList = data;
+    console.log(selectedList);
+    selected_tags = selectedList.map(e=>e.id);
+    //console.log("selected after delete tags: ", selected_tags);
+  }
 
   const onSubmit = async (data: Inputs) => {
     const dateError = endDate < startDate ? "Start date must be before end date" : null
@@ -92,7 +107,7 @@ export const AddEditEventForm = ({
           startDate: startDate,
           endDate: endDate,
           allDay: data.allDay,
-          tagsIds: [],
+          tagsIds: selected_tags,
         },
       });
       openSnackbar("Event successfully edited!");
@@ -106,7 +121,7 @@ export const AddEditEventForm = ({
           startDate: startDate,
           endDate: endDate,
           allDay: data.allDay,
-          tagsIds: [],
+          tagsIds: selected_tags,
         },
       });
       openSnackbar("Event successfully added!");
@@ -180,9 +195,10 @@ export const AddEditEventForm = ({
             <Multiselect showArrow options={user_tags_ids} displayValue="name"
 
               selectedValues={tagsIds}
-            //onSelect={(e) => setEventTags(e.target.value)}
+              onSelect={onSelect} // Function will trigger on select event
+              onRemove={onRemove} // Function will trigger on remove event
             />
-
+            
           </LocalizationProvider>
           <FormControlLabel
             control={
