@@ -42,8 +42,8 @@ export const AddEditEventModal = ({
     <Dialog
       sx={{
         "& .MuiDialog-paper": {
-          maxWidth: "500px",
-          maxHeight: "700px",
+          maxWidth: "600px",
+          maxHeight: "900px",
         },
       }}
       open={open}

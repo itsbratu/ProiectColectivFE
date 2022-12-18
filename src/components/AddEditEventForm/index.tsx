@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { TextField, Box, FormControlLabel, Checkbox } from "@mui/material";
+import { TextField, Box, FormControlLabel, Checkbox, Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -31,6 +31,12 @@ export type AddEditEventFormProps = {
   token: string;
 };
 
+type EventError = {
+  title: string | null;
+  date: string | null;
+  description: string | null;
+}
+
 export const AddEditEventForm = ({
   handleFormClose,
   editMode,
@@ -60,8 +66,23 @@ export const AddEditEventForm = ({
   const { register, handleSubmit, reset } = useForm<Inputs>();
   const { mutate: addEvent } = useAddEvent(token);
   const { mutate: editEvent } = useEditEvent(token);
+  const [eventError, setEventError] = useState<EventError>({ date: null, description: null, title: null })
 
   const onSubmit = async (data: Inputs) => {
+    const dateError = endDate < startDate ? "Start date must be before end date" : null
+    const descriptionError = description.length > 100 ? "Description must be at most 100 characters long" : null
+    const titleError = title.length === 0 ? "Title must not be empty" : (title.length > 20 ? "Title must be at most 20 characters long" : null)
+
+    setEventError({
+      date: dateError,
+      description: descriptionError,
+      title: titleError,
+    })
+
+    if (dateError || descriptionError || titleError) {
+      return
+    }
+
     if (editMode) {
       editEvent({
         updatePayload: {
@@ -111,6 +132,8 @@ export const AddEditEventForm = ({
             placeholder={"Title"}
             onChange={(e) => setTitle(e.target.value)}
             style={{ width: 400 }}
+            error={eventError.title !== null}
+            helperText={eventError.title}
           />
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DateTimePicker
@@ -140,6 +163,7 @@ export const AddEditEventForm = ({
                 <TextField {...params} style={{ width: 400 }} />
               )}
             />
+            {eventError.date !== null && <Typography color="red" alignSelf="start">{eventError.date}</Typography>}
             <TextField
               {...register("description")}
               id="description"
@@ -150,6 +174,8 @@ export const AddEditEventForm = ({
               onChange={(e: any) => setDescription(e.target.value)}
               placeholder="Description"
               style={{ width: 400 }}
+              error={eventError.description !== null}
+              helperText={eventError.description}
             />
             <Multiselect showArrow options={user_tags_ids} displayValue="name"
 
