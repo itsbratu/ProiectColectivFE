@@ -1,6 +1,19 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { TextField, Box, FormControlLabel, Checkbox, Typography, Chip, MenuItem, Select, SelectChangeEvent, OutlinedInput, InputLabel, FormControl } from "@mui/material";
+import {
+  TextField,
+  Box,
+  FormControlLabel,
+  Checkbox,
+  Typography,
+  Chip,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  OutlinedInput,
+  InputLabel,
+  FormControl,
+} from "@mui/material";
 import Button from "@mui/material/Button";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -8,9 +21,7 @@ import { Event } from "../../models/event";
 import { Tag } from "../../models/tag";
 import { useAddEvent } from "../../api/mutations/useAddEvent";
 import { useEditEvent } from "../../api/mutations/useEditEvent";
-import { Multiselect } from "multiselect-react-dropdown";
-import { Theme, useTheme } from '@mui/material/styles';
-
+import { useTheme } from "@mui/material/styles";
 
 export interface Inputs {
   title: string;
@@ -37,7 +48,7 @@ type EventError = {
   title: string | null;
   date: string | null;
   description: string | null;
-}
+};
 
 export const AddEditEventForm = ({
   handleFormClose,
@@ -51,7 +62,9 @@ export const AddEditEventForm = ({
   token,
 }: AddEditEventFormProps): JSX.Element => {
   const [title, setTitle] = useState<string>(event ? event.title : "");
-  const [eventTagsIds, setEventTagsIds] = useState<string[]>(event ? event.tags.map(e => e.id) : []);
+  const [eventTagsIds, setEventTagsIds] = useState<string[]>(
+    event ? event.tags.map((e) => e.id) : []
+  );
   const [startDate, setStartDate] = useState<Date>(
     event ? event.startDate : new Date()
   );
@@ -65,22 +78,35 @@ export const AddEditEventForm = ({
   const { register, handleSubmit, reset } = useForm<Inputs>();
   const { mutate: addEvent } = useAddEvent(token);
   const { mutate: editEvent } = useEditEvent(token);
-  const [eventError, setEventError] = useState<EventError>({ date: null, description: null, title: null })
-  const theme = useTheme()
+  const [eventError, setEventError] = useState<EventError>({
+    date: null,
+    description: null,
+    title: null,
+  });
+  const theme = useTheme();
 
   const onSubmit = async (data: Inputs) => {
-    const dateError = endDate < startDate ? "Start date must be before end date" : null
-    const descriptionError = description.length > 100 ? "Description must be at most 100 characters long" : null
-    const titleError = title.length === 0 ? "Title must not be empty" : (title.length > 20 ? "Title must be at most 20 characters long" : null)
+    const dateError =
+      endDate < startDate ? "Start date must be before end date" : null;
+    const descriptionError =
+      description.length > 100
+        ? "Description must be at most 100 characters long"
+        : null;
+    const titleError =
+      title.length === 0
+        ? "Title must not be empty"
+        : title.length > 20
+        ? "Title must be at most 20 characters long"
+        : null;
 
     setEventError({
       date: dateError,
       description: descriptionError,
       title: titleError,
-    })
+    });
 
     if (dateError || descriptionError || titleError) {
-      return
+      return;
     }
 
     if (editMode) {
@@ -115,7 +141,6 @@ export const AddEditEventForm = ({
     handleFormClose();
   };
 
-
   return (
     <>
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -125,7 +150,6 @@ export const AddEditEventForm = ({
           alignItems="center"
           gap="30px"
         >
-
           <TextField
             {...register("title")}
             id="title"
@@ -164,7 +188,11 @@ export const AddEditEventForm = ({
                 <TextField {...params} style={{ width: 400 }} />
               )}
             />
-            {eventError.date !== null && <Typography color="red" alignSelf="start">{eventError.date}</Typography>}
+            {eventError.date !== null && (
+              <Typography color="red" alignSelf="start">
+                {eventError.date}
+              </Typography>
+            )}
             <TextField
               {...register("description")}
               id="description"
@@ -180,40 +208,60 @@ export const AddEditEventForm = ({
             />
             <FormControl fullWidth>
               <InputLabel id="demo-multiple-chip-label">Tags</InputLabel>
-              <Select multiple
+              <Select
+                multiple
                 labelId="demo-multiple-chip-label"
                 value={eventTagsIds}
                 onChange={(e) => {
-                  const { value } = e.target
-                  setEventTagsIds(typeof value === "string" ? value.split(",") : value)
+                  const { value } = e.target;
+                  setEventTagsIds(
+                    typeof value === "string" ? value.split(",") : value
+                  );
                 }}
                 style={{ width: "100%" }}
                 input={<OutlinedInput label="Tags" />}
-                renderValue={(selected) =>
-                (<Box sx={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: 0.5
-                }}>
-                  {
-                    selected.map((value) => <Chip key={value}
-                      label={user_tags_ids.find(e => e.id === value)?.name ?? ""}
-                      style={{ backgroundColor: `#${user_tags_ids.find(e => e.id === value)?.colorCode ?? ""}`, color: "white" }}
-                    />)
-                  }
-                </Box>)
-                }
+                renderValue={(selected) => (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: 0.5,
+                    }}
+                  >
+                    {selected.map((value) => (
+                      <Chip
+                        key={value}
+                        label={
+                          user_tags_ids.find((e) => e.id === value)?.name ?? ""
+                        }
+                        style={{
+                          backgroundColor: `#${
+                            user_tags_ids.find((e) => e.id === value)
+                              ?.colorCode ?? ""
+                          }`,
+                          color: "white",
+                        }}
+                      />
+                    ))}
+                  </Box>
+                )}
               >
-                {user_tags_ids.map((tag) => (<MenuItem key={tag.id} value={tag.id} style={{
-                  fontWeight: eventTagsIds.indexOf(tag.id) === -1 ?
-                    theme.typography.fontWeightRegular
-                    : theme.typography.fontWeightMedium
-                }}>
-                  {tag.name}
-                </MenuItem>))}
+                {user_tags_ids.map((tag) => (
+                  <MenuItem
+                    key={tag.id}
+                    value={tag.id}
+                    style={{
+                      fontWeight:
+                        eventTagsIds.indexOf(tag.id) === -1
+                          ? theme.typography.fontWeightRegular
+                          : theme.typography.fontWeightMedium,
+                    }}
+                  >
+                    {tag.name}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
-
           </LocalizationProvider>
           <FormControlLabel
             control={

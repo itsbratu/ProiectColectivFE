@@ -8,8 +8,6 @@ class TagsService {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log(result);
-
     return result.data;
   }
 }

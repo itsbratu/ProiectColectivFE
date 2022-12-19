@@ -1,5 +1,4 @@
 import { AddEventPayload, Event, UpdateEventPayload } from "../../models/event";
-import { USER_STORAGE_KEY } from "../constants";
 import http from "./common";
 
 class EventsService {
@@ -9,7 +8,6 @@ class EventsService {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log(result);
 
     return result.data;
   }
