@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { TextField, Box, FormControlLabel, Checkbox, Typography, Chip, MenuItem, Select, SelectChangeEvent } from "@mui/material";
+import { TextField, Box, FormControlLabel, Checkbox, Typography, Chip, MenuItem, Select, SelectChangeEvent, OutlinedInput, InputLabel, FormControl } from "@mui/material";
 import Button from "@mui/material/Button";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -9,6 +9,8 @@ import { Tag } from "../../models/tag";
 import { useAddEvent } from "../../api/mutations/useAddEvent";
 import { useEditEvent } from "../../api/mutations/useEditEvent";
 import { Multiselect } from "multiselect-react-dropdown";
+import { Theme, useTheme } from '@mui/material/styles';
+
 
 export interface Inputs {
   title: string;
@@ -48,10 +50,8 @@ export const AddEditEventForm = ({
   openSnackbar,
   token,
 }: AddEditEventFormProps): JSX.Element => {
-  console.log(event?.tags);
-  console.log(event?.title);
   const [title, setTitle] = useState<string>(event ? event.title : "");
-  const [eventTags, setEventTags] = useState<Tag[]>(event ? event.tags : []);
+  const [eventTagsIds, setEventTagsIds] = useState<string[]>(event ? event.tags.map(e => e.id) : []);
   const [startDate, setStartDate] = useState<Date>(
     event ? event.startDate : new Date()
   );
@@ -66,22 +66,7 @@ export const AddEditEventForm = ({
   const { mutate: addEvent } = useAddEvent(token);
   const { mutate: editEvent } = useEditEvent(token);
   const [eventError, setEventError] = useState<EventError>({ date: null, description: null, title: null })
-
-  function onSelect(selectedList: Tag[], selectedItem: Tag) {
-    //console.log(selectedItem);
-    //selectedList.push(selectedItem.id);
-    console.log(selectedList);
-    selected_tags = selectedList.map(e => e.id);
-    //console.log("selected tags:", selected_tags);
-  }
-  function onRemove(selectedList: Tag[], selectedItem: Tag) {
-    // console.log(selectedItem);
-    //const data = selectedList.filter(el=> el != selectedItem.id);
-    //selectedList = data;
-    console.log(selectedList);
-    selected_tags = selectedList.map(e => e.id);
-    //console.log("selected after delete tags: ", selected_tags);
-  }
+  const theme = useTheme()
 
   const onSubmit = async (data: Inputs) => {
     const dateError = endDate < startDate ? "Start date must be before end date" : null
@@ -107,7 +92,7 @@ export const AddEditEventForm = ({
           startDate: startDate,
           endDate: endDate,
           allDay: data.allDay,
-          tagsIds: selected_tags,
+          tagsIds: eventTagsIds,
         },
       });
       openSnackbar("Event successfully edited!");
@@ -121,7 +106,7 @@ export const AddEditEventForm = ({
           startDate: startDate,
           endDate: endDate,
           allDay: data.allDay,
-          tagsIds: selected_tags,
+          tagsIds: eventTagsIds,
         },
       });
       openSnackbar("Event successfully added!");
@@ -130,15 +115,6 @@ export const AddEditEventForm = ({
     handleFormClose();
   };
 
-  // const handleChange = (event: SelectChangeEvent<typeof eventTags>) => {
-  //   const {
-  //     target: { value },
-  //   } = event;
-  //   setEventTags(
-  //     // On autofill we get a stringified value.
-  //     typeof value === 'string' ? value.split(',') : value,
-  //   );
-  // };
 
   return (
     <>
@@ -149,9 +125,7 @@ export const AddEditEventForm = ({
           alignItems="center"
           gap="30px"
         >
-          {eventTags && <Box display="flex" gap="10px">
-            {eventTags.map(e => <Chip style={{ backgroundColor: `#${e.colorCode}` }} label={e.name} />)}
-          </Box>}
+
           <TextField
             {...register("title")}
             id="title"
@@ -169,7 +143,6 @@ export const AddEditEventForm = ({
               inputFormat="MM/DD/YYYY hh:mm"
               value={startDate}
               onChange={(date: any) => {
-                console.log(date);
                 if (date != undefined) {
                   setStartDate(date!);
                 }
@@ -205,22 +178,41 @@ export const AddEditEventForm = ({
               error={eventError.description !== null}
               helperText={eventError.description}
             />
-            <Select style={{ width: "100%" }} multiple
-              value={eventTags}
-              renderValue={s => s.map(e => e.name).join(",")}
-              onChange={e => {
-                console.log(e.target.value);
-
-                // if (!(eventTags.filter(t => t.id === e.target.value).length != 0)) {
-                // @ts-ignore
-                setEventTags((e.target.value).map(eventId => typeof eventId === "string" ? user_tags_ids.find(tag => tag.id === eventId) as Tag : eventId))
-                // }
-              }
-              }>
-              {user_tags_ids && user_tags_ids.map(e =>
-                <MenuItem value={e.id} >{e.name}</MenuItem>
-              )}
-            </Select>
+            <FormControl fullWidth>
+              <InputLabel id="demo-multiple-chip-label">Tags</InputLabel>
+              <Select multiple
+                labelId="demo-multiple-chip-label"
+                value={eventTagsIds}
+                onChange={(e) => {
+                  const { value } = e.target
+                  setEventTagsIds(typeof value === "string" ? value.split(",") : value)
+                }}
+                style={{ width: "100%" }}
+                input={<OutlinedInput label="Tags" />}
+                renderValue={(selected) =>
+                (<Box sx={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: 0.5
+                }}>
+                  {
+                    selected.map((value) => <Chip key={value}
+                      label={user_tags_ids.find(e => e.id === value)?.name ?? ""}
+                      style={{ backgroundColor: `#${user_tags_ids.find(e => e.id === value)?.colorCode ?? ""}`, color: "white" }}
+                    />)
+                  }
+                </Box>)
+                }
+              >
+                {user_tags_ids.map((tag) => (<MenuItem key={tag.id} value={tag.id} style={{
+                  fontWeight: eventTagsIds.indexOf(tag.id) === -1 ?
+                    theme.typography.fontWeightRegular
+                    : theme.typography.fontWeightMedium
+                }}>
+                  {tag.name}
+                </MenuItem>))}
+              </Select>
+            </FormControl>
 
           </LocalizationProvider>
           <FormControlLabel
