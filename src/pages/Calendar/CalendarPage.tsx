@@ -1,5 +1,6 @@
-import { Box, Button } from "@mui/material";
+import {Box, Button} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import LabelIcon from '@mui/icons-material/Label';
 import { useState } from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
@@ -14,6 +15,7 @@ import { useTags } from "../../api/queries/useTags";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { USER_STORAGE_KEY } from "../../api/constants";
 import { getMixedColor, rgbToHex } from "../../helpers/colorsConvert";
+import {TagsModal} from "./components/TagsModal";
 
 const localizer = momentLocalizer(moment);
 
@@ -30,6 +32,8 @@ const CalendarPage = ({ token, setToken }: CalendarPageProps) => {
   const { tags } = useTags(token);
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [currentEvent, setCurrentEvent] = useState<Event | undefined>();
+  const [openTagsModal, setOpenTagsModal] = useState<boolean>(false);
+
 
   const eventStyleGetter = (
     event: Event,
@@ -134,6 +138,26 @@ const CalendarPage = ({ token, setToken }: CalendarPageProps) => {
       >
         <AddIcon sx={{ fontSize: 40 }} />
       </Button>
+      <Button
+          variant="contained"
+          sx={{
+              position: "fixed",
+              width: "75px",
+              height: "75px",
+              bottom: "20px",
+              right: "200px",
+              borderRadius: "45px",
+              background: "#31b3ce",
+              "&:hover": {
+                  background: "#31b3ce",
+              },
+          }}
+          onClick={() => {
+              setOpenTagsModal(true);
+          }}
+      >
+        <LabelIcon sx={{ fontSize: 40 }} />
+      </Button>
 
       <AddEditEventModal
         event={currentEvent}
@@ -151,6 +175,17 @@ const CalendarPage = ({ token, setToken }: CalendarPageProps) => {
         }
         token={token}
         user_tags_ids={tags ?? []}
+      />
+      <TagsModal
+        open={openTagsModal}
+        handleClose={() => {
+          setOpenTagsModal(false);
+        }}
+        openSnackbar={(snackbarMessage: string) =>
+          handleSnackbarOpen(snackbarMessage)
+        }
+        token={token}
+        tags={tags ?? []}
       />
       <Snackbar
         open={openSnackbar}
