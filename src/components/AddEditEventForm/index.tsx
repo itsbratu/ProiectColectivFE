@@ -164,7 +164,7 @@ export const AddEditEventForm = ({
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DateTimePicker
               label="Start date"
-              inputFormat="MM/DD/YYYY hh:mm"
+              inputFormat="MM/DD/YYYY hh:mm A"
               value={startDate}
               onChange={(date: any) => {
                 if (date != undefined) {
@@ -177,7 +177,7 @@ export const AddEditEventForm = ({
             />
             <DateTimePicker
               label="End date"
-              inputFormat="MM/DD/YYYY hh:mm"
+              inputFormat="MM/DD/YYYY hh:mm A"
               value={endDate}
               onChange={(date) => {
                 if (date != undefined) {

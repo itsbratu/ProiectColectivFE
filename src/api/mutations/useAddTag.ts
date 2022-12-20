@@ -15,7 +15,10 @@ export const useAddTag = (token: string) => {
   const { mutate } = useMutation<Tag, AxiosError, AddTagMutationPayload>(
     ({ createPayload }) => tagsService.addTag(createPayload, token),
     {
-      onSuccess: () => queryClient.invalidateQueries(TAGS_KEY),
+      onSuccess: () => {
+        queryClient.invalidateQueries(TAGS_KEY);
+        queryClient.invalidateQueries(EVENTS_KEY);
+      }
     }
   );
 
