@@ -70,7 +70,7 @@ export const AddEditTagForm = ({
         updatePayload: {
           id: tag!.id!,
           name: data.name,
-          colorCode: data.colorCode,
+          colorCode: colorCode,
         },
       });
       openSnackbar("Tag successfully edited!");
@@ -80,12 +80,11 @@ export const AddEditTagForm = ({
       addTag({
         createPayload: {
           name: data.name,
-          colorCode: data.colorCode,
+          colorCode: colorCode,
         },
       });
       openSnackbar("Tag successfully added!");
     }
-    openSnackbar(data.colorCode);
     reset();
     handleFormClose();
   };
