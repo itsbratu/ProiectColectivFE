@@ -24,6 +24,8 @@ import {useEditEvent} from "../../api/mutations/useEditEvent";
 import {useTheme} from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
 import {DeleteOutline} from "@mui/icons-material";
+import {useDeleteEvent} from "../../api/mutations/useDeleteEvent";
+import {useDeleteTag} from "../../api/mutations/useDeleteTag";
 
 // export interface Inputs {
 //   title: string;
@@ -32,7 +34,7 @@ import {DeleteOutline} from "@mui/icons-material";
 // }
 
 export type TagsMasterDetailsProps = {
-  handleFormClose: () => void;
+  handleFormOpen: (tag: Tag) => void;
   tags?: Tag[];
   openSnackbar: (message: string) => void;
   token: string;
@@ -43,11 +45,14 @@ export type TagsMasterDetailsProps = {
 // };
 
 export const TagsMasterDetails = ({
-                                    handleFormClose,
+                                    handleFormOpen,
                                     tags,
                                     openSnackbar,
                                     token,
                                   }: TagsMasterDetailsProps): JSX.Element => {
+
+  const {mutate: deleteTag} = useDeleteTag(token);
+
   return (
     <>
       <Box
@@ -60,7 +65,7 @@ export const TagsMasterDetails = ({
           <span>
             <Button
               onClick={() => {
-                //todo open new modal
+                handleFormOpen(tag)
               }}
               style={{textTransform: 'none'}}
               sx={{
@@ -74,7 +79,7 @@ export const TagsMasterDetails = ({
             </Button>
             <IconButton
               onClick={() => {
-                //todo actual deletion
+                deleteTag({id: tag!.id!});
                 openSnackbar("Tag successfully deleted!");
               }}
               sx={{
