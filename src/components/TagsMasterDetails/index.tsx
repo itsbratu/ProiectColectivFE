@@ -80,6 +80,7 @@ export const TagsMasterDetails = ({
             <IconButton
               onClick={() => {
                 deleteTag({id: tag!.id!});
+                openSnackbar("Tag successfully deleted!");
               }}
               sx={{
                 width: "10px",

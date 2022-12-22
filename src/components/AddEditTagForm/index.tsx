@@ -69,7 +69,7 @@ export const AddEditTagForm = ({
       editTag({
         updatePayload: {
           id: tag!.id!,
-          name: data.name,
+          name: name,
           colorCode: colorCode,
         },
       });
@@ -79,7 +79,7 @@ export const AddEditTagForm = ({
     } else {
       addTag({
         createPayload: {
-          name: data.name,
+          name: name,
           colorCode: colorCode,
         },
       });
