@@ -5,4 +5,6 @@ export type Tag = {
 };
 
 
+export type UpdateTagPayload = Tag;
+
 export type AddTagPayload = Omit<Tag, "id">;

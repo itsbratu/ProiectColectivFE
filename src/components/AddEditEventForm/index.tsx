@@ -113,11 +113,11 @@ export const AddEditEventForm = ({
       editEvent({
         updatePayload: {
           id: event!.id!,
-          title: data.title,
-          description: data.description,
+          title: title,
+          description: description,
           startDate: startDate,
           endDate: endDate,
-          allDay: data.allDay,
+          allDay: allDay,
           tagsIds: eventTagsIds,
         },
       });
@@ -127,11 +127,11 @@ export const AddEditEventForm = ({
     } else {
       addEvent({
         createPayload: {
-          title: data.title,
-          description: data.description,
+          title: title,
+          description: description,
           startDate: startDate,
           endDate: endDate,
-          allDay: data.allDay,
+          allDay: allDay,
           tagsIds: eventTagsIds,
         },
       });
@@ -151,6 +151,7 @@ export const AddEditEventForm = ({
           gap="30px"
         >
           <TextField
+            sx={{marginTop:3}}
             {...register("title")}
             id="title"
             name="title"
@@ -164,7 +165,7 @@ export const AddEditEventForm = ({
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DateTimePicker
               label="Start date"
-              inputFormat="MM/DD/YYYY hh:mm"
+              inputFormat="MM/DD/YYYY hh:mm A"
               value={startDate}
               onChange={(date: any) => {
                 if (date != undefined) {
@@ -177,7 +178,7 @@ export const AddEditEventForm = ({
             />
             <DateTimePicker
               label="End date"
-              inputFormat="MM/DD/YYYY hh:mm"
+              inputFormat="MM/DD/YYYY hh:mm A"
               value={endDate}
               onChange={(date) => {
                 if (date != undefined) {
