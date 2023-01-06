@@ -16,9 +16,9 @@ export interface Inputs {
 export type ChangeDateFormProps = {
   handleFormClose: () => void;
   isAgenda: boolean;
-  length: number;
+  endDay: Date;
   currentDay: Date;
-  handleDateSubmit:(newLength: number, newCurrentDay: Date) => void;
+  handleDateSubmit:(newEndDay: Date|null, newCurrentDay: Date) => void;
 };
 
 type DateError = {
@@ -28,14 +28,12 @@ type DateError = {
 export const ChangeDateForm = ({
                                  handleFormClose,
                                  isAgenda,
-                                 length,
+                                 endDay,
                                  currentDay,
                                  handleDateSubmit
                                }: ChangeDateFormProps): JSX.Element => {
   const [currentDate, setCurrentDate] = useState<Date>(currentDay);
-  let auxDate=new Date();
-  auxDate.setDate(currentDay.getDate()+length);
-  const [endDate, setEndDate] = useState<Date>(auxDate);
+  const [endDate, setEndDate] = useState<Date>(endDay);
   const {handleSubmit, reset} = useForm<Inputs>();
   const [dateError, setDateError] = useState<DateError>({
     endDate: null,
@@ -53,14 +51,9 @@ export const ChangeDateForm = ({
       if (dateError) {
         return;
       }
-      let difference = endDate.getTime() - currentDate.getTime();
-      let nrDays = Math.ceil(difference / (1000 * 3600 * 24)) - 1;
-      handleDateSubmit(nrDays, currentDate);
+      handleDateSubmit(endDate, currentDate);
     }else{
-      let auxEndDate=new Date();
-      auxEndDate.setDate(currentDate.getDate()+length);
-      setEndDate(auxEndDate);
-      handleDateSubmit(length, currentDate);
+      handleDateSubmit(null, currentDate);
     }
     reset();
     handleFormClose();

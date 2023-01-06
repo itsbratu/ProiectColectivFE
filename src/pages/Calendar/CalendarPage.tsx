@@ -25,6 +25,19 @@ export type CalendarPageProps = {
   setToken: (token: string | null) => void;
 };
 
+function getAfterDays(currentDate: Date, length: number): Date {
+  let auxDay = new Date(currentDate);
+  auxDay.setDate(currentDate.getDate() + length);
+  return auxDay;
+}
+
+function getDaysInBetween(start: Date, end: Date): number {
+  start.setUTCHours(0,0,0,0);
+  end.setUTCHours(0,0,0,0);
+  const timeDifference = end.getTime() - start.getTime();
+  return timeDifference / (1000 * 3600 * 24);
+}
+
 const CalendarPage = ({token, setToken}: CalendarPageProps) => {
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>("");
@@ -38,6 +51,7 @@ const CalendarPage = ({token, setToken}: CalendarPageProps) => {
   const [isAgenda, setIsAgenda] = useState<boolean>(false);
   const [currentDay, setCurrentDay] = useState<Date>(new Date());
   const [length, setLength] = useState(30);
+  const [endDay, setEndDay] = useState<Date>(getAfterDays(currentDay, length));
 
 
   const eventStyleGetter = (
@@ -97,8 +111,11 @@ const CalendarPage = ({token, setToken}: CalendarPageProps) => {
           setEditModeFlag(true);
           setOpenModal(true);
         }}
-        onNavigate={(newDate) => setCurrentDay(newDate)}
-        onView={(newView) => setIsAgenda(newView=="agenda")}
+        onNavigate={(newDate) => {
+          setCurrentDay(newDate);
+          setEndDay(getAfterDays(newDate, length));
+        }}
+        onView={(newView) => setIsAgenda(newView == "agenda")}
         date={currentDay}
         length={length}
       />
@@ -218,11 +235,16 @@ const CalendarPage = ({token, setToken}: CalendarPageProps) => {
         handleClose={() => {
           setOpenDateModal(false);
         }}
-        length={length}
+        endDay={endDay}
         currentDay={currentDay}
-        handleSubmit={(newLength: number, newCurrentDay: Date) => {
-          setLength(newLength);
+        handleSubmit={(newEndDay: Date | null, newCurrentDay: Date) => {
           setCurrentDay(newCurrentDay);
+          if (newEndDay == null) {
+            setEndDay(getAfterDays(newCurrentDay, length))
+          } else {
+            setEndDay(newEndDay);
+            setLength(getDaysInBetween(newCurrentDay, newEndDay));
+          }
         }
         }
       />

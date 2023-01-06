@@ -11,16 +11,16 @@ export type ChangeDateModalProps = {
   open: boolean;
   isAgenda: boolean;
   handleClose: () => void;
-  length: number;
+  endDay: Date;
   currentDay: Date;
-  handleSubmit:(newLength: number, newCurrentDay: Date) => void;
+  handleSubmit:(newEndDay: Date|null, newCurrentDay: Date) => void;
 };
 
 export const ChangeDateModal = ({
                                   open,
                                   isAgenda,
                                   handleClose,
-                                  length,
+                                  endDay,
                                   currentDay,
                                   handleSubmit
                                 }: ChangeDateModalProps): JSX.Element => {
@@ -58,7 +58,7 @@ export const ChangeDateModal = ({
         <DialogContent sx={{marginBottom: "35px"}}>
           <ChangeDateForm
             isAgenda={isAgenda}
-            length={length}
+            endDay={endDay}
             handleFormClose={handleClose}
             currentDay={currentDay}
             handleDateSubmit={handleSubmit}
