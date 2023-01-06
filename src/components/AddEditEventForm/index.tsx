@@ -41,6 +41,7 @@ export type AddEditEventFormProps = {
   resetEditMode: () => void;
   openSnackbar: (message: string) => void;
   token: string;
+  defaultDate: Date;
 };
 
 type EventError = {
@@ -53,21 +54,22 @@ export const AddEditEventForm = ({
   handleFormClose,
   editMode,
   event,
-                                   user_tags_ids = [],
+  user_tags_ids = [],
   resetCurrentEvent,
   resetEditMode,
   openSnackbar,
   token,
+  defaultDate,
 }: AddEditEventFormProps): JSX.Element => {
   const [title, setTitle] = useState<string>(event ? event.title : "");
   const [eventTagsIds, setEventTagsIds] = useState<string[]>(
     event ? event.tags.map((e) => e.id) : []
   );
   const [startDate, setStartDate] = useState<Date>(
-    event ? event.startDate : new Date()
+    event ? event.startDate : defaultDate
   );
   const [endDate, setEndDate] = useState<Date>(
-    event ? event.endDate : new Date()
+    event ? event.endDate : defaultDate
   );
   const [description, setDescription] = useState<string>(
     event ? event.description : ""

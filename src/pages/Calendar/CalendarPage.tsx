@@ -217,6 +217,7 @@ const CalendarPage = ({token, setToken}: CalendarPageProps) => {
         }
         token={token}
         user_tags_ids={tags ?? []}
+        defaultDate={currentDay}
       />
       <TagsModal
         open={openTagsModal}
