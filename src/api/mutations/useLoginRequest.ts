@@ -1,5 +1,5 @@
 import { AxiosError } from "axios";
-import { useMutation, useQuery, useQueryClient } from "react-query";
+import { useMutation } from "react-query";
 import authService from "../services/AuthService";
 
 type LoginPayload = {
@@ -7,7 +7,6 @@ type LoginPayload = {
 };
 
 export const useLoginRequest = () => {
-  const queryClient = useQueryClient();
   const { mutate, isLoading, data, error } = useMutation<
     LoginResponse,
     AxiosError,

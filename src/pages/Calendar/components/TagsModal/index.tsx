@@ -5,7 +5,7 @@ import {
   Typography,
   DialogContent,
 } from "@mui/material";
-import {AddCircleOutline, DeleteOutline} from "@mui/icons-material";
+import {AddCircleOutline} from "@mui/icons-material";
 import IconButton from "@mui/material/IconButton";
 import {Tag} from "../../../../models/tag";
 import {TagsMasterDetails} from "../../../../components/TagsMasterDetails";

@@ -5,7 +5,6 @@ import {
   Typography,
   DialogContent,
 } from "@mui/material";
-import Button from "@mui/material/Button";
 import { DeleteOutline } from "@mui/icons-material";
 import { useDeleteEvent } from "../../../../api/mutations/useDeleteEvent";
 import { AddEditEventForm } from "../../../../components/AddEditEventForm";

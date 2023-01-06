@@ -9,7 +9,6 @@ import {
   Chip,
   MenuItem,
   Select,
-  SelectChangeEvent,
   OutlinedInput,
   InputLabel,
   FormControl,
@@ -54,8 +53,7 @@ export const AddEditEventForm = ({
   handleFormClose,
   editMode,
   event,
-  selected_tags = [],
-  user_tags_ids = [],
+                                   user_tags_ids = [],
   resetCurrentEvent,
   resetEditMode,
   openSnackbar,
@@ -85,7 +83,7 @@ export const AddEditEventForm = ({
   });
   const theme = useTheme();
 
-  const onSubmit = async (data: Inputs) => {
+  const onSubmit = async () => {
     const dateError =
       endDate < startDate ? "Start date must be before end date" : null;
     const descriptionError =

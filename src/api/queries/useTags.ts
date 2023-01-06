@@ -1,6 +1,6 @@
 import { useQuery } from "react-query";
 import { Tag } from "../../models/tag";
-import { EVENTS_KEY, TAGS_KEY } from "../constants";
+import { TAGS_KEY } from "../constants";
 import TagsService from "../services/TagsService";
 
 export const useTags = (token: string) => {

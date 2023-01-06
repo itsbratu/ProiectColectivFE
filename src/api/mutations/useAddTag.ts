@@ -1,8 +1,6 @@
 import { AxiosError } from "axios";
 import { useMutation, useQueryClient } from "react-query";
-import { AddEventPayload, Event } from "../../models/event";
 import {EVENTS_KEY, TAGS_KEY} from "../constants";
-import eventsService from "../services/eventsService";
 import {AddTagPayload, Tag} from "../../models/tag";
 import tagsService from "../services/TagsService";
 

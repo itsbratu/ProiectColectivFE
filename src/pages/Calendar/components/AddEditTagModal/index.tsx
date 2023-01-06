@@ -5,9 +5,6 @@ import {
   Typography,
   DialogContent,
 } from "@mui/material";
-import { DeleteOutline } from "@mui/icons-material";
-import { useDeleteTag } from "../../../../api/mutations/useDeleteTag";
-import IconButton from "@mui/material/IconButton";
 import {Tag} from "../../../../models/tag";
 import {AddEditTagForm} from "../../../../components/AddEditTagForm";
 
