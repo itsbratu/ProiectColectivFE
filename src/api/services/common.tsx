@@ -1,10 +1,8 @@
-import axios, { AxiosResponse } from "axios";
+import axios from "axios";
 import { USER_STORAGE_KEY } from "../constants";
 const dateKeyRx = /date/i;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Response<T = any, D = any> = AxiosResponse<T, D>;
-
 const http = axios.create({
   baseURL: "http://localhost:8080/",
   headers: {

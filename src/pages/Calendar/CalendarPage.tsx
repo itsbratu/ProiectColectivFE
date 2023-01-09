@@ -1,6 +1,5 @@
 import {Box, Button} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import LabelIcon from '@mui/icons-material/Label';
 import {useState} from "react";
 import {Calendar, momentLocalizer} from "react-big-calendar";
 import moment from "moment";
@@ -16,6 +15,8 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import {USER_STORAGE_KEY} from "../../api/constants";
 import {getMixedColor, rgbToHex} from "../../helpers/colorsConvert";
 import {TagsModal} from "./components/TagsModal";
+import {CalendarToday, LabelImportant} from "@mui/icons-material";
+import {ChangeDateModal} from "./components/ChangeDateModal";
 
 const localizer = momentLocalizer(moment);
 
@@ -23,6 +24,19 @@ export type CalendarPageProps = {
   token: string;
   setToken: (token: string | null) => void;
 };
+
+function getAfterDays(currentDate: Date, length: number): Date {
+  let auxDay = new Date(currentDate);
+  auxDay.setDate(currentDate.getDate() + length);
+  return auxDay;
+}
+
+function getDaysInBetween(start: Date, end: Date): number {
+  start.setUTCHours(0,0,0,0);
+  end.setUTCHours(0,0,0,0);
+  const timeDifference = end.getTime() - start.getTime();
+  return timeDifference / (1000 * 3600 * 24);
+}
 
 const CalendarPage = ({token, setToken}: CalendarPageProps) => {
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
@@ -33,15 +47,17 @@ const CalendarPage = ({token, setToken}: CalendarPageProps) => {
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [currentEvent, setCurrentEvent] = useState<Event | undefined>();
   const [openTagsModal, setOpenTagsModal] = useState<boolean>(false);
+  const [openDateModal, setOpenDateModal] = useState<boolean>(false);
+  const [isAgenda, setIsAgenda] = useState<boolean>(false);
+  const [currentDay, setCurrentDay] = useState<Date>(new Date());
+  const [length, setLength] = useState(30);
+  const [endDay, setEndDay] = useState<Date>(getAfterDays(currentDay, length));
 
 
   const eventStyleGetter = (
     event: Event,
-    start: Date,
-    end: Date,
-    isSelected: boolean
   ) => {
-    var backgroundColor = "";
+    let backgroundColor: string;
     if (event.tags.length === 0) {
       backgroundColor = "#87CEFA";
     } else if (event.tags.length === 1) {
@@ -60,7 +76,7 @@ const CalendarPage = ({token, setToken}: CalendarPageProps) => {
         mixedColorRGB[2]
       );
     }
-    var style = {
+    const style = {
       backgroundColor: backgroundColor,
       borderRadius: "0px",
       opacity: 0.8,
@@ -95,6 +111,13 @@ const CalendarPage = ({token, setToken}: CalendarPageProps) => {
           setEditModeFlag(true);
           setOpenModal(true);
         }}
+        onNavigate={(newDate) => {
+          setCurrentDay(newDate);
+          setEndDay(getAfterDays(newDate, length));
+        }}
+        onView={(newView) => setIsAgenda(newView == "agenda")}
+        date={currentDay}
+        length={length}
       />
       <Button
         variant="contained"
@@ -154,10 +177,29 @@ const CalendarPage = ({token, setToken}: CalendarPageProps) => {
         }}
         onClick={() => {
           setOpenTagsModal(true);
-          setEditModeFlag(true);
         }}
       >
-        <LabelIcon sx={{fontSize: 40}}/>
+        <LabelImportant sx={{fontSize: 40}}/>
+      </Button>
+      <Button
+        variant="contained"
+        sx={{
+          position: "fixed",
+          width: "75px",
+          height: "75px",
+          bottom: "20px",
+          right: "290px",
+          borderRadius: "45px",
+          background: "#31b3ce",
+          "&:hover": {
+            background: "#31b3ce",
+          },
+        }}
+        onClick={() => {
+          setOpenDateModal(true);
+        }}
+      >
+        <CalendarToday sx={{fontSize: 40}}/>
       </Button>
 
       <AddEditEventModal
@@ -175,6 +217,7 @@ const CalendarPage = ({token, setToken}: CalendarPageProps) => {
         }
         token={token}
         user_tags_ids={tags ?? []}
+        defaultDate={currentDay}
       />
       <TagsModal
         open={openTagsModal}
@@ -186,6 +229,25 @@ const CalendarPage = ({token, setToken}: CalendarPageProps) => {
         }
         token={token}
         tags={tags ?? []}
+      />
+      <ChangeDateModal
+        open={openDateModal}
+        isAgenda={isAgenda}
+        handleClose={() => {
+          setOpenDateModal(false);
+        }}
+        endDay={endDay}
+        currentDay={currentDay}
+        handleSubmit={(newEndDay: Date | null, newCurrentDay: Date) => {
+          setCurrentDay(newCurrentDay);
+          if (newEndDay == null) {
+            setEndDay(getAfterDays(newCurrentDay, length))
+          } else {
+            setEndDay(newEndDay);
+            setLength(getDaysInBetween(newCurrentDay, newEndDay));
+          }
+        }
+        }
       />
       <Snackbar
         open={openSnackbar}

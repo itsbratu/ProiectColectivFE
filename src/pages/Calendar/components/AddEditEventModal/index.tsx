@@ -5,7 +5,6 @@ import {
   Typography,
   DialogContent,
 } from "@mui/material";
-import Button from "@mui/material/Button";
 import { DeleteOutline } from "@mui/icons-material";
 import { useDeleteEvent } from "../../../../api/mutations/useDeleteEvent";
 import { AddEditEventForm } from "../../../../components/AddEditEventForm";
@@ -23,6 +22,7 @@ export type AddEditEventModalProps = {
   openSnackbar: (message: string) => void;
   token: string;
   user_tags_ids: Tag[];
+  defaultDate:Date;
 };
 
 export const AddEditEventModal = ({
@@ -35,6 +35,7 @@ export const AddEditEventModal = ({
   openSnackbar,
   token,
   user_tags_ids,
+  defaultDate,
 }: AddEditEventModalProps): JSX.Element => {
   const { mutate: deleteEvent } = useDeleteEvent(token);
 
@@ -93,6 +94,7 @@ export const AddEditEventModal = ({
           openSnackbar={openSnackbar}
           token={token}
           user_tags_ids={user_tags_ids}
+          defaultDate={defaultDate}
         />
       </DialogContent>
     </Dialog>

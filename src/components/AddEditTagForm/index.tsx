@@ -49,7 +49,7 @@ export const AddEditTagForm = ({
     name: null,
   });
 
-  const onSubmit = async (data: Inputs) => {
+  const onSubmit = async () => {
     const nameError =
       name.length === 0
         ? "Name must not be empty"
