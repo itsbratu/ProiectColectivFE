@@ -1,4 +1,5 @@
 import { AddEventPayload, Event, UpdateEventPayload } from "../../models/event";
+import { FilterEventsPayload } from "../../models/tag";
 import http from "./common";
 
 class EventsService {
@@ -40,6 +41,22 @@ class EventsService {
         Authorization: `Bearer ${token}`,
       },
     });
+    return result.data;
+  }
+
+  async filterEvents(
+    payload: FilterEventsPayload,
+    token: string
+  ): Promise<Event[]> {
+    const result = await http.post<Event[]>(
+      "/filter-events",
+      JSON.stringify(payload),
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return result.data;
   }
 }
