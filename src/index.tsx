@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { BrowserRouter, Switch } from "react-router-dom";
 import { ReactQueryProvider } from "./api/queryClient";
 import App from "./App";
 
@@ -9,7 +10,11 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <ReactQueryProvider>
-      <App />
+      <BrowserRouter>
+      <Switch>
+        <App />
+      </Switch>
+      </BrowserRouter>
     </ReactQueryProvider>
   </React.StrictMode>
 );
