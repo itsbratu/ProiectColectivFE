@@ -13,6 +13,7 @@ import { useState } from 'react';
 import { useRegisterRequest, User } from '../../api/mutations/useRegisterRequest';
 import { useEffect } from 'react';
 import { USER_STORAGE_KEY } from '../../api/constants';
+import { useLoginRequest } from '../../api/mutations/useLoginRequest';
 
 const theme = createTheme();
 
@@ -33,10 +34,13 @@ type ConfirmPassword ={
 export default function Register({ setToken }: Props) {
     const [user, setUser] = useState<User>({ username: "", password: "" })
     const { mutate: register, data: registerData, error } = useRegisterRequest();
+    //const { mutate: login, data: loginData} = useLoginRequest();
     const [registerError, setRegisterError] = useState<RegisterError>({ username: null, password: null, confirm_password: null })
     let [confirm_password, setConfirmPassword] = useState<ConfirmPassword>({ password:"" });
+    let ok = false;
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        ok = false;
         event.preventDefault();
         if (user.username.length < 3 || user.password.length < 6 || user.password !== confirm_password.password) {
             setRegisterError({
@@ -48,6 +52,12 @@ export default function Register({ setToken }: Props) {
         } else {
             setRegisterError({ username: null, password: null, confirm_password:null })
             await register({ createPayload: user });
+            if(registerError.confirm_password == null && registerError.confirm_password == null && registerError.username ==null && !error){
+                ok = true;
+            }
+            console.log(ok);
+
+            //await login({createPayload: user});
         }
     };
 
@@ -119,7 +129,8 @@ export default function Register({ setToken }: Props) {
                             error={registerError.confirm_password !== null}
                             helperText={registerError.confirm_password}
                         />
-                        {error && !hasLocalError() && <Typography mt={3} color="red">Couldn't register with given credentials</Typography>}
+                        {error && !hasLocalError() && <Typography mt={3} color="red">Username is taken!</Typography>}
+                        {!hasLocalError && !error && ok && <Typography mt={3} color="green"> User registered successfully!</Typography>}
                         <Button
                             type="submit"
                             fullWidth
