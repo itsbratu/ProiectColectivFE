@@ -1,14 +1,19 @@
-import { Box, CircularProgress, Typography } from "@mui/material";
+import {Box, CircularProgress} from "@mui/material";
 import CalendarPage from "./pages/Calendar/CalendarPage";
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
-import { useState } from "react";
+import {Redirect, Route, Switch, useHistory} from 'react-router-dom';
+import React, {useState} from "react";
 import LoginPage from "./pages/Login/Login";
-import { USER_STORAGE_KEY } from "./api/constants";
-import { useEffect } from "react";
+import RegisterPage from "./pages/Register/Register";
+import {USER_STORAGE_KEY} from "./api/constants";
+import {useEffect} from "react";
 
 function App() {
   const [token, setToken] = useState<string | null>();
   const [loaded, setLoaded] = useState<Boolean>(false)
+  const history = useHistory();
+  const changePage = (url: string) =>{
+    history.push(url);
+  }
 
   useEffect(() => {
     const data = localStorage.getItem(USER_STORAGE_KEY);
@@ -23,24 +28,30 @@ function App() {
 
   if (!loaded) {
     return <Box display="flex" justifyContent="center" alignItems="center">
-      <CircularProgress />
+      <CircularProgress/>
     </Box>
   }
 
   if (!token) {
-    return <LoginPage setToken={setToken} />
+    if (history.location.pathname === "/") {
+      return <LoginPage setToken={setToken} changePage={changePage}/>
+    }
   }
 
-  return <BrowserRouter>
+
+  return <>
     <Switch>
-      <Route path="/">
-        <CalendarPage token={token} setToken={setToken} />
-      </Route>
       <Route path="/login">
-        <LoginPage setToken={setToken} />
+        <LoginPage setToken={setToken} changePage={changePage}/>
+      </Route>
+      <Route path="/register">
+        <RegisterPage setToken={setToken} changePage={changePage}/>
+      </Route>
+      <Route path="/" render={() => <Redirect to="/login"/>}>
+        <CalendarPage token={token!} setToken={setToken}/>
       </Route>
     </Switch>
-  </BrowserRouter>
+  </>
 }
 
 export default App;
