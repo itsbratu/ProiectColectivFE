@@ -12,12 +12,12 @@ import { useState } from 'react';
 import { useLoginRequest, User } from '../../api/mutations/useLoginRequest';
 import { useEffect } from 'react';
 import { USER_STORAGE_KEY } from '../../api/constants';
-import { Link, Router } from 'react-router-dom';
 
 const theme = createTheme();
 
 interface Props {
     setToken: (token: string) => void;
+    changePage: (url: string) => void;
 }
 
 type LoginError = {
@@ -25,7 +25,7 @@ type LoginError = {
     password: string | null;
 }
 
-export default function Login({ setToken }: Props) {
+export default function Login({ setToken,changePage }: Props) {
     const [user, setUser] = useState<User>({ username: "", password: "" })
     const { mutate: login, data: loginData, error } = useLoginRequest();
     const [loginError, setLoginError] = useState<LoginError>({ username: null, password: null })
@@ -48,6 +48,9 @@ export default function Login({ setToken }: Props) {
         if (loginData) {
             localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(loginData));
             setToken(loginData.token)
+            if(loginData.token){
+                changePage("/");
+            }
         }
     }, [loginData])
 
@@ -99,7 +102,6 @@ export default function Login({ setToken }: Props) {
                             helperText={loginError.password}
                         />
                         {error && !hasLocalError() && <Typography mt={3} color="red">Couldn't log in with given credentials</Typography>}
-                        don't have an account? <Link to="/register">Register here!</Link>
                         <Button
                             type="submit"
                             fullWidth
@@ -107,6 +109,14 @@ export default function Login({ setToken }: Props) {
                             sx={{ mt: 3, mb: 2 }}
                         >
                             Log in
+                        </Button>
+                        <Button
+                          fullWidth
+                          variant="contained"
+                          sx={{ mt: 3, mb: 2 }}
+                          onClick={()=>changePage("/register")}
+                        >
+                            Go to Register
                         </Button>
                     </Box>
                 </Box>

@@ -9,16 +9,15 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useState } from 'react';
-//import { useLoginRequest, User } from '../../api/mutations/useLoginRequest';
 import { useRegisterRequest, User } from '../../api/mutations/useRegisterRequest';
 import { useEffect } from 'react';
-import { USER_STORAGE_KEY } from '../../api/constants';
-import { useLoginRequest } from '../../api/mutations/useLoginRequest';
+import {useLoginRequest} from "../../api/mutations/useLoginRequest";
 
 const theme = createTheme();
 
 interface Props {
     setToken: (token: string) => void;
+    changePage: (url: string) => void;
 }
 
 type RegisterError = {
@@ -26,47 +25,44 @@ type RegisterError = {
     password: string | null;
     confirm_password: string | null;
 }
-
-type ConfirmPassword ={
-    password: string | null;
-}
-
-export default function Register({ setToken }: Props) {
+export default function Register({changePage }: Props) {
     const [user, setUser] = useState<User>({ username: "", password: "" })
+    const [passwordConfirmation, setPasswordConfirmation] = useState<string>("");
     const { mutate: register, data: registerData, error } = useRegisterRequest();
-    //const { mutate: login, data: loginData} = useLoginRequest();
+    const { mutate: login, data: loginData} = useLoginRequest();
     const [registerError, setRegisterError] = useState<RegisterError>({ username: null, password: null, confirm_password: null })
-    let [confirm_password, setConfirmPassword] = useState<ConfirmPassword>({ password:"" });
-    let ok = false;
+    const [noSubmitYet, setNoSubmitYet] = useState(true);
+    const [lastSubmitSuccess, setLastSubmitSuccess] = useState(false);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-        ok = false;
+        setNoSubmitYet(false);
         event.preventDefault();
-        if (user.username.length < 3 || user.password.length < 6 || user.password !== confirm_password.password) {
+        if (user.username.length < 3 || user.password.length < 6 || user.password !== passwordConfirmation) {
             setRegisterError({
                 ...registerError,
                 username: user.username.length < 3 ? "Username should have at least 3 characters" : null,
                 password: user.password.length < 6 ? "Password should have at leats 6 characters " : null,
-                confirm_password: user.password !== confirm_password.password ? "Passwords dont match": null
+                confirm_password: user.password !== passwordConfirmation ? "Passwords dont match": null
             })
         } else {
             setRegisterError({ username: null, password: null, confirm_password:null })
             await register({ createPayload: user });
-            if(registerError.confirm_password == null && registerError.confirm_password == null && registerError.username ==null && !error){
-                ok = true;
-            }
-            console.log(ok);
-
-            //await login({createPayload: user});
         }
     };
 
     useEffect(() => {
         if (registerData) {
-            localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(registerData));
-            setToken(registerData.token)
+            login({createPayload: user});
         }
     }, [registerData])
+
+    useEffect(() => {
+        if (loginData) {
+            setLastSubmitSuccess(true);
+        }else{
+            setLastSubmitSuccess(false);
+        }
+    }, [loginData])
 
     const hasLocalError = () => registerError.username != null || registerError.password != null || registerError.confirm_password != null
 
@@ -124,13 +120,13 @@ export default function Register({ setToken }: Props) {
                             type="password"
                             id="confirm_password"
                             autoComplete="confirm-password"
-                            value={confirm_password.password}
-                            onChange={e => setConfirmPassword({ password: e.target.value })}
+                            value={passwordConfirmation}
+                            onChange={e => setPasswordConfirmation(e.target.value)}
                             error={registerError.confirm_password !== null}
                             helperText={registerError.confirm_password}
                         />
                         {error && !hasLocalError() && <Typography mt={3} color="red">Username is taken!</Typography>}
-                        {!hasLocalError && !error && ok && <Typography mt={3} color="green"> User registered successfully!</Typography>}
+                        {!noSubmitYet && lastSubmitSuccess && <Typography mt={3} color="green"> User registered successfully!</Typography>}
                         <Button
                             type="submit"
                             fullWidth
@@ -138,6 +134,14 @@ export default function Register({ setToken }: Props) {
                             sx={{ mt: 3, mb: 2 }}
                         >
                             Register
+                        </Button>
+                        <Button
+                          fullWidth
+                          variant="contained"
+                          sx={{ mt: 3, mb: 2 }}
+                          onClick={()=>changePage("/login")}
+                        >
+                            Go to Login
                         </Button>
                     </Box>
                 </Box>
