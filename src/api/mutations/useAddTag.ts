@@ -1,5 +1,5 @@
-import { AxiosError } from "axios";
-import { useMutation, useQueryClient } from "react-query";
+import {AxiosError} from "axios";
+import {useMutation, useQueryClient} from "react-query";
 import {EVENTS_KEY, TAGS_KEY} from "../constants";
 import {AddTagPayload, Tag} from "../../models/tag";
 import tagsService from "../services/TagsService";
@@ -14,8 +14,8 @@ export const useAddTag = (token: string) => {
     ({ createPayload }) => tagsService.addTag(createPayload, token),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries(TAGS_KEY);
-        queryClient.invalidateQueries(EVENTS_KEY);
+        queryClient.invalidateQueries([TAGS_KEY]);
+        queryClient.invalidateQueries([EVENTS_KEY]);
       }
     }
   );

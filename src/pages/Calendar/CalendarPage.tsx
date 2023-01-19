@@ -1,22 +1,24 @@
-import {Box, Button} from "@mui/material";
+import { Box, Button } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import {useState} from "react";
-import {Calendar, momentLocalizer} from "react-big-calendar";
+import { useState } from "react";
+import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import {Event} from "../../models/event";
-import {useEvents} from "../../api/queries/useEvents";
+import { Event } from "../../models/event";
 import "./CalendarStyle.css";
-import {AddEditEventModal} from "./components/AddEditEventModal";
+import { AddEditEventModal } from "./components/AddEditEventModal";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
-import {useTags} from "../../api/queries/useTags";
+import { useTags } from "../../api/queries/useTags";
 import LogoutIcon from "@mui/icons-material/Logout";
-import {USER_STORAGE_KEY} from "../../api/constants";
-import {getMixedColor, rgbToHex} from "../../helpers/colorsConvert";
-import {TagsModal} from "./components/TagsModal";
-import {CalendarToday, LabelImportant} from "@mui/icons-material";
-import {ChangeDateModal} from "./components/ChangeDateModal";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import { USER_STORAGE_KEY } from "../../api/constants";
+import { getMixedColor, rgbToHex } from "../../helpers/colorsConvert";
+import { TagsModal } from "./components/TagsModal";
+import { CalendarToday, LabelImportant } from "@mui/icons-material";
+import { ChangeDateModal } from "./components/ChangeDateModal";
+import { FilterEventsModal } from "./components/FilterEventsModal";
+import { useFilterEvents } from "../../api/queries/useFilterEvents";
 
 const localizer = momentLocalizer(moment);
 
@@ -32,31 +34,35 @@ function getAfterDays(currentDate: Date, length: number): Date {
 }
 
 function getDaysInBetween(start: Date, end: Date): number {
-  start.setUTCHours(0,0,0,0);
-  end.setUTCHours(0,0,0,0);
+  start.setUTCHours(0, 0, 0, 0);
+  end.setUTCHours(0, 0, 0, 0);
   const timeDifference = end.getTime() - start.getTime();
   return timeDifference / (1000 * 3600 * 24);
 }
 
-const CalendarPage = ({token, setToken}: CalendarPageProps) => {
+const CalendarPage = ({ token, setToken }: CalendarPageProps) => {
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>("");
-  const [editModeFlag, setEditModeFlag] = useState<boolean>(true);
-  const {events} = useEvents(token);
-  const {tags} = useTags(token);
-  const [openModal, setOpenModal] = useState<boolean>(false);
+
   const [currentEvent, setCurrentEvent] = useState<Event | undefined>();
+  const [eventEditModeFlag, setEventEditModeFlag] = useState<boolean>(true);
+  const [openAddEditModal, setOpenAddEditModal] = useState<boolean>(false);
+
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const { events } = useFilterEvents(selectedTags,token);
+
+  const { tags } = useTags(token);
   const [openTagsModal, setOpenTagsModal] = useState<boolean>(false);
+
   const [openDateModal, setOpenDateModal] = useState<boolean>(false);
   const [isAgenda, setIsAgenda] = useState<boolean>(false);
   const [currentDay, setCurrentDay] = useState<Date>(new Date());
   const [length, setLength] = useState(30);
   const [endDay, setEndDay] = useState<Date>(getAfterDays(currentDay, length));
 
+  const [openFilterModal, setOpenFilterModal] = useState<boolean>(false);
 
-  const eventStyleGetter = (
-    event: Event,
-  ) => {
+  const eventStyleGetter = (event: Event) => {
     let backgroundColor: string;
     if (event.tags.length === 0) {
       backgroundColor = "#87CEFA";
@@ -108,14 +114,14 @@ const CalendarPage = ({token, setToken}: CalendarPageProps) => {
         eventPropGetter={eventStyleGetter}
         onSelectEvent={(event) => {
           setCurrentEvent(event);
-          setEditModeFlag(true);
-          setOpenModal(true);
+          setEventEditModeFlag(true);
+          setOpenAddEditModal(true);
         }}
         onNavigate={(newDate) => {
           setCurrentDay(newDate);
           setEndDay(getAfterDays(newDate, length));
         }}
-        onView={(newView) => setIsAgenda(newView == "agenda")}
+        onView={(newView) => setIsAgenda(newView === "agenda")}
         date={currentDay}
         length={length}
       />
@@ -138,7 +144,7 @@ const CalendarPage = ({token, setToken}: CalendarPageProps) => {
           setToken(null);
         }}
       >
-        <LogoutIcon sx={{fontSize: 40}}/>
+        <LogoutIcon sx={{ fontSize: 40 }} />
       </Button>
       <Button
         variant="contained"
@@ -155,11 +161,10 @@ const CalendarPage = ({token, setToken}: CalendarPageProps) => {
           },
         }}
         onClick={() => {
-          setOpenModal(true);
-          setEditModeFlag(false);
+          setOpenTagsModal(true);
         }}
       >
-        <AddIcon sx={{fontSize: 40}}/>
+        <LabelImportant sx={{ fontSize: 40 }} />
       </Button>
       <Button
         variant="contained"
@@ -176,10 +181,10 @@ const CalendarPage = ({token, setToken}: CalendarPageProps) => {
           },
         }}
         onClick={() => {
-          setOpenTagsModal(true);
+          setOpenDateModal(true);
         }}
       >
-        <LabelImportant sx={{fontSize: 40}}/>
+        <CalendarToday sx={{ fontSize: 40 }} />
       </Button>
       <Button
         variant="contained"
@@ -196,22 +201,43 @@ const CalendarPage = ({token, setToken}: CalendarPageProps) => {
           },
         }}
         onClick={() => {
-          setOpenDateModal(true);
+          setOpenFilterModal(true);
         }}
       >
-        <CalendarToday sx={{fontSize: 40}}/>
+        <FilterListIcon sx={{ fontSize: 40 }} />
+      </Button>
+      <Button
+        variant="contained"
+        sx={{
+          position: "fixed",
+          width: "75px",
+          height: "75px",
+          bottom: "20px",
+          right: "380px",
+          borderRadius: "45px",
+          background: "#31b3ce",
+          "&:hover": {
+            background: "#31b3ce",
+          },
+        }}
+        onClick={() => {
+          setEventEditModeFlag(false);
+          setOpenAddEditModal(true);
+        }}
+      >
+        <AddIcon sx={{ fontSize: 40 }} />
       </Button>
 
       <AddEditEventModal
         event={currentEvent}
-        editMode={editModeFlag}
-        open={openModal}
+        editMode={eventEditModeFlag}
+        open={openAddEditModal}
         handleClose={() => {
-          setOpenModal(false);
+          setOpenAddEditModal(false);
           setCurrentEvent(undefined);
         }}
         resetCurrentEvent={() => setCurrentEvent(undefined)}
-        resetEditMode={() => setEditModeFlag(true)}
+        resetEditMode={() => setEventEditModeFlag(true)}
         openSnackbar={(snackbarMessage: string) =>
           handleSnackbarOpen(snackbarMessage)
         }
@@ -241,24 +267,34 @@ const CalendarPage = ({token, setToken}: CalendarPageProps) => {
         handleSubmit={(newEndDay: Date | null, newCurrentDay: Date) => {
           setCurrentDay(newCurrentDay);
           if (newEndDay == null) {
-            setEndDay(getAfterDays(newCurrentDay, length))
+            setEndDay(getAfterDays(newCurrentDay, length));
           } else {
             setEndDay(newEndDay);
             setLength(getDaysInBetween(newCurrentDay, newEndDay));
           }
-        }
-        }
+        }}
+      />
+      <FilterEventsModal
+        open={openFilterModal}
+        handleClose={() => {
+          setOpenFilterModal(false);
+        }}
+        selectedTags={selectedTags}
+        allTags={tags}
+        handleChangeSelectedTags={(tagsIds: string[]) => {
+          setSelectedTags(tagsIds);
+        }}
       />
       <Snackbar
         open={openSnackbar}
         autoHideDuration={2000}
         onClose={() => setOpenSnackbar(false)}
-        anchorOrigin={{vertical: "bottom", horizontal: "center"}}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
         <Alert
           onClose={() => setOpenSnackbar(false)}
           severity="success"
-          sx={{width: "100%"}}
+          sx={{ width: "100%" }}
         >
           {snackbarMessage}
         </Alert>
