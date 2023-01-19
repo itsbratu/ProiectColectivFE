@@ -1,6 +1,6 @@
-import { useQuery } from "react-query";
-import { Tag } from "../../models/tag";
-import { TAGS_KEY } from "../constants";
+import {useQuery} from "react-query";
+import {Tag} from "../../models/tag";
+import {TAGS_KEY} from "../constants";
 import TagsService from "../services/TagsService";
 
 export const useTags = (token: string) => {
@@ -8,7 +8,7 @@ export const useTags = (token: string) => {
     data: tags,
     isLoading,
     isError,
-  } = useQuery<Tag[]>(TAGS_KEY, () => TagsService.getTags(token));
+  } = useQuery<Tag[]>([TAGS_KEY], () => TagsService.getTags(token));
 
   return { tags, isLoading, isError };
 };

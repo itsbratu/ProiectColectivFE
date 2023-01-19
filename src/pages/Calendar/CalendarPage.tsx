@@ -1,11 +1,10 @@
 import { Box, Button } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { Event } from "../../models/event";
-import { useEvents } from "../../api/queries/useEvents";
 import "./CalendarStyle.css";
 import { AddEditEventModal } from "./components/AddEditEventModal";
 import Snackbar from "@mui/material/Snackbar";
@@ -19,8 +18,7 @@ import { TagsModal } from "./components/TagsModal";
 import { CalendarToday, LabelImportant } from "@mui/icons-material";
 import { ChangeDateModal } from "./components/ChangeDateModal";
 import { FilterEventsModal } from "./components/FilterEventsModal";
-import { Tag } from "../../models/tag";
-import { useFilterEvents } from "../../api/mutations/useFilterEvents";
+import { useFilterEvents } from "../../api/queries/useFilterEvents";
 
 const localizer = momentLocalizer(moment);
 
@@ -45,21 +43,24 @@ function getDaysInBetween(start: Date, end: Date): number {
 const CalendarPage = ({ token, setToken }: CalendarPageProps) => {
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>("");
-  const [editModeFlag, setEditModeFlag] = useState<boolean>(true);
-  const { events } = useEvents(token);
-  const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
-  const { tags } = useTags(token);
-  const [openModal, setOpenModal] = useState<boolean>(false);
+
   const [currentEvent, setCurrentEvent] = useState<Event | undefined>();
+  const [eventEditModeFlag, setEventEditModeFlag] = useState<boolean>(true);
+  const [openAddEditModal, setOpenAddEditModal] = useState<boolean>(false);
+
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const { events } = useFilterEvents(selectedTags,token);
+
+  const { tags } = useTags(token);
   const [openTagsModal, setOpenTagsModal] = useState<boolean>(false);
+
   const [openDateModal, setOpenDateModal] = useState<boolean>(false);
-  const [openFilterModal, setOpenFilterModal] = useState<boolean>(false);
   const [isAgenda, setIsAgenda] = useState<boolean>(false);
   const [currentDay, setCurrentDay] = useState<Date>(new Date());
   const [length, setLength] = useState(30);
   const [endDay, setEndDay] = useState<Date>(getAfterDays(currentDay, length));
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const { mutate } = useFilterEvents(token);
+
+  const [openFilterModal, setOpenFilterModal] = useState<boolean>(false);
 
   const eventStyleGetter = (event: Event) => {
     let backgroundColor: string;
@@ -99,33 +100,11 @@ const CalendarPage = ({ token, setToken }: CalendarPageProps) => {
     setSnackbarMessage(message);
   };
 
-  useEffect(() => {
-    if (!selectedTags || !tags) return;
-    var ids: string[] = [];
-    selectedTags.forEach((selectedTag) => {
-      const tagId = tags.find((tag) => tag.name === selectedTag)!.id;
-      ids.push(tagId);
-    });
-    mutate(
-      { filterPayload: { tagsIds: ids } },
-      {
-        onSuccess: (data) => {
-          setFilteredEvents(data);
-        },
-      }
-    );
-  }, [selectedTags]);
-
-  useEffect(() => {
-    if (!events) return;
-    setFilteredEvents(events);
-  }, []);
-
   return (
     <Box display="flex" flexDirection="column">
       <Calendar
         localizer={localizer}
-        events={filteredEvents}
+        events={events}
         startAccessor="startDate"
         endAccessor="endDate"
         style={{
@@ -135,14 +114,14 @@ const CalendarPage = ({ token, setToken }: CalendarPageProps) => {
         eventPropGetter={eventStyleGetter}
         onSelectEvent={(event) => {
           setCurrentEvent(event);
-          setEditModeFlag(true);
-          setOpenModal(true);
+          setEventEditModeFlag(true);
+          setOpenAddEditModal(true);
         }}
         onNavigate={(newDate) => {
           setCurrentDay(newDate);
           setEndDay(getAfterDays(newDate, length));
         }}
-        onView={(newView) => setIsAgenda(newView == "agenda")}
+        onView={(newView) => setIsAgenda(newView === "agenda")}
         date={currentDay}
         length={length}
       />
@@ -182,27 +161,6 @@ const CalendarPage = ({ token, setToken }: CalendarPageProps) => {
           },
         }}
         onClick={() => {
-          setOpenModal(true);
-          setEditModeFlag(false);
-        }}
-      >
-        <AddIcon sx={{ fontSize: 40 }} />
-      </Button>
-      <Button
-        variant="contained"
-        sx={{
-          position: "fixed",
-          width: "75px",
-          height: "75px",
-          bottom: "20px",
-          right: "200px",
-          borderRadius: "45px",
-          background: "#31b3ce",
-          "&:hover": {
-            background: "#31b3ce",
-          },
-        }}
-        onClick={() => {
           setOpenTagsModal(true);
         }}
       >
@@ -215,7 +173,7 @@ const CalendarPage = ({ token, setToken }: CalendarPageProps) => {
           width: "75px",
           height: "75px",
           bottom: "20px",
-          right: "290px",
+          right: "200px",
           borderRadius: "45px",
           background: "#31b3ce",
           "&:hover": {
@@ -235,7 +193,7 @@ const CalendarPage = ({ token, setToken }: CalendarPageProps) => {
           width: "75px",
           height: "75px",
           bottom: "20px",
-          right: "380px",
+          right: "290px",
           borderRadius: "45px",
           background: "#31b3ce",
           "&:hover": {
@@ -248,17 +206,38 @@ const CalendarPage = ({ token, setToken }: CalendarPageProps) => {
       >
         <FilterListIcon sx={{ fontSize: 40 }} />
       </Button>
+      <Button
+        variant="contained"
+        sx={{
+          position: "fixed",
+          width: "75px",
+          height: "75px",
+          bottom: "20px",
+          right: "380px",
+          borderRadius: "45px",
+          background: "#31b3ce",
+          "&:hover": {
+            background: "#31b3ce",
+          },
+        }}
+        onClick={() => {
+          setEventEditModeFlag(false);
+          setOpenAddEditModal(true);
+        }}
+      >
+        <AddIcon sx={{ fontSize: 40 }} />
+      </Button>
 
       <AddEditEventModal
         event={currentEvent}
-        editMode={editModeFlag}
-        open={openModal}
+        editMode={eventEditModeFlag}
+        open={openAddEditModal}
         handleClose={() => {
-          setOpenModal(false);
+          setOpenAddEditModal(false);
           setCurrentEvent(undefined);
         }}
         resetCurrentEvent={() => setCurrentEvent(undefined)}
-        resetEditMode={() => setEditModeFlag(true)}
+        resetEditMode={() => setEventEditModeFlag(true)}
         openSnackbar={(snackbarMessage: string) =>
           handleSnackbarOpen(snackbarMessage)
         }
@@ -302,7 +281,9 @@ const CalendarPage = ({ token, setToken }: CalendarPageProps) => {
         }}
         selectedTags={selectedTags}
         allTags={tags}
-        handleChangeSelectedTags={(tags: string[]) => setSelectedTags(tags)}
+        handleChangeSelectedTags={(tagsIds: string[]) => {
+          setSelectedTags(tagsIds);
+        }}
       />
       <Snackbar
         open={openSnackbar}

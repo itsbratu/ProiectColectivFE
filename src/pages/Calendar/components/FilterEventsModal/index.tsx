@@ -4,33 +4,14 @@ import {
   DialogTitle,
   Typography,
   DialogContent,
-  FormControl,
-  InputLabel,
-  Select,
-  OutlinedInput,
-  SelectChangeEvent,
-  Checkbox,
-  ListItemText,
 } from "@mui/material";
 import { Tag } from "../../../../models/tag";
-import MenuItem from "@mui/material/MenuItem";
-
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },
-};
-
+import {EventsTagFilterDetails} from "../../../../components/EventsTagFilterDetails";
 export type FilterEventsModalProps = {
   open: boolean;
   handleClose: () => void;
   allTags: Tag[] | undefined;
-  selectedTags: string[] | undefined;
+  selectedTags: string[];
   handleChangeSelectedTags: (newTags: string[]) => void;
 };
 
@@ -41,23 +22,12 @@ export const FilterEventsModal = ({
   selectedTags,
   handleChangeSelectedTags,
 }: FilterEventsModalProps): JSX.Element => {
-  const handleChangeTags = (event: SelectChangeEvent<typeof selectedTags>) => {
-    const {
-      target: { value },
-    } = event;
-    if (selectedTags && value) {
-      handleChangeSelectedTags(
-        typeof value === "string" ? value.split(",") : value
-      );
-    }
-  };
-
   return (
     <>
       <Dialog
         sx={{
           "& .MuiDialog-paper": {
-            maxWidth: "600px",
+            maxWidth: "700px",
             maxHeight: "900px",
           },
         }}
@@ -79,30 +49,11 @@ export const FilterEventsModal = ({
           </Box>
         </DialogTitle>
         <DialogContent sx={{ marginBottom: "35px" }}>
-          {selectedTags && (
-            <FormControl sx={{ m: 1, width: 300 }}>
-              <InputLabel id="tags_label">Tags</InputLabel>
-              <Select
-                labelId="tags_label"
-                id="tags_label"
-                multiple
-                value={selectedTags}
-                onChange={handleChangeTags}
-                input={<OutlinedInput label="Tag" />}
-                renderValue={(selectedTags) => selectedTags.join(",")}
-                MenuProps={MenuProps}
-              >
-                {selectedTags &&
-                  allTags &&
-                  allTags.map((tag) => (
-                    <MenuItem key={tag.id} value={tag.name}>
-                      <Checkbox checked={selectedTags.indexOf(tag.name) > -1} />
-                      <ListItemText primary={tag.name} />
-                    </MenuItem>
-                  ))}
-              </Select>
-            </FormControl>
-          )}
+          <EventsTagFilterDetails
+            allTags={allTags}
+            selectedTags={selectedTags}
+            handleChangeSelectedTags={handleChangeSelectedTags}
+          />
         </DialogContent>
       </Dialog>
     </>

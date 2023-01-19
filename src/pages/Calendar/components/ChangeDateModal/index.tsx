@@ -25,7 +25,7 @@ export const ChangeDateModal = ({
                                   handleSubmit
                                 }: ChangeDateModalProps): JSX.Element => {
 
-  let titleLabel = isAgenda? "Filter" : "Jump To Date";
+  let titleLabel = isAgenda? "Filter By Date" : "Jump To Date";
 
   return (
     <>
